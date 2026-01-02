@@ -1,0 +1,29 @@
+{
+  "activityEntities" : [
+    "projectCreated",
+    [
+      {
+        "createdDate" : "2026-01-01T01:38:25Z",
+        "event" : "projectCreated",
+        "id" : "6C02708F-02AC-4080-9A1B-A71B8B5C273B",
+        "subtitle" : "PicSurge V1",
+        "title" : "Project Created"
+      }
+    ]
+  ],
+  "authorName" : "Isabella Zorra",
+  "createdDate" : "2026-01-01T01:38:25Z",
+  "description" : "",
+  "id" : "B7BE6DCA-CABB-4467-BBE9-EC4072C31F21",
+  "license" : "",
+  "location" : "",
+  "modifiedDate" : "2026-01-01T01:38:25Z",
+  "projectName" : "PicSurge V1",
+  "settingsEntity" : {
+    "snapshotOnExtendTraining" : true,
+    "snapshotOnResumeTraining" : false
+  },
+  "taskType" : "imageClassifier",
+  "title" : "Image Classification",
+  "version" : "1.1"
+}
