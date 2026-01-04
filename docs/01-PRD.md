@@ -115,13 +115,14 @@ An intelligent iOS app that:
 | **Use Case** | Photos ML missed or non-surgical sensitive images |
 | **Priority** | P1 - High |
 
-#### F8: Export/Share Functionality
+#### F8: Export/Share Functionality ✅ IMPLEMENTED
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Securely export photos from vault |
-| **Methods** | AirDrop, secure email, save to Files app |
-| **Audit** | Log all export actions |
-| **Priority** | P2 - Medium |
+| **Methods** | iOS Share Sheet (AirDrop, iMessage, WhatsApp, Email, Files, etc.) |
+| **Multi-Select** | Select multiple photos for batch sharing |
+| **Single Share** | Share individual photos from detail view |
+| **Priority** | P0 - Implemented in MVP |
 
 #### F9: Search & Organization
 | Attribute | Requirement |
@@ -153,13 +154,18 @@ An intelligent iOS app that:
 | US5 | Healthcare provider | Remove surgical photos from camera roll | Sensitive images aren't mixed with personal photos | - Photos deleted after secure storage confirmed<br>- Confirmation dialog shown<br>- Can recover from Recently Deleted |
 | US6 | Healthcare provider | Set up a PIN backup | I can access photos if Face ID fails | - 6-digit PIN setup during onboarding<br>- PIN works when biometric fails<br>- Can reset PIN with verification |
 
+### Implemented User Stories
+
+| ID | As a... | I want to... | So that... | Status |
+|----|---------|--------------|------------|--------|
+| US9 | Healthcare provider | Export photos securely | I can share for consultations | ✅ Implemented |
+
 ### Post-MVP User Stories
 
 | ID | As a... | I want to... | So that... |
 |----|---------|--------------|------------|
 | US7 | Healthcare provider | Have photos scanned automatically | I don't have to remember to scan |
 | US8 | Healthcare provider | Manually add photos to vault | I can secure images ML missed |
-| US9 | Healthcare provider | Export photos securely | I can share for consultations |
 | US10 | Healthcare provider | Organize photos by case/patient | I can find images when needed |
 | US11 | Healthcare provider | Back up vault to cloud | I don't lose photos if phone lost |
 
@@ -196,6 +202,9 @@ An intelligent iOS app that:
 - Organized by date (sections)
 - Full-screen viewer on tap
 - Photo count and storage used
+- **Multi-select mode**: Select multiple photos for batch operations
+- **Share functionality**: Export selected photos via iOS Share Sheet
+- **Batch delete**: Delete multiple photos at once
 
 #### Screen 5: Settings
 - Authentication settings (PIN change, biometric toggle)

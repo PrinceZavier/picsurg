@@ -103,9 +103,10 @@ PicSurg/
 │   │   └── PhotoDetailView.swift
 │   │
 │   ├── Vault/
-│   │   ├── VaultView.swift
+│   │   ├── VaultView.swift          # Multi-select, share, batch delete
 │   │   ├── VaultGridView.swift
-│   │   └── SecurePhotoView.swift
+│   │   ├── SecurePhotoView.swift
+│   │   └── ShareSheet.swift         # UIActivityViewController wrapper
 │   │
 │   ├── Settings/
 │   │   └── SettingsView.swift
@@ -217,7 +218,7 @@ class VaultService {
                   originalAsset: PHAsset) async throws -> VaultPhoto
 
     // Retrieve decrypted photo
-    func getPhoto(id: UUID) async throws -> Data
+    func getPhoto(id: UUID) throws -> Data
 
     // List all vault photos (metadata only)
     func listPhotos() -> [VaultPhoto]
@@ -225,10 +226,55 @@ class VaultService {
     // Delete from vault
     func deletePhoto(id: UUID) throws
 
-    // Export photo (decrypt for sharing)
-    func exportPhoto(id: UUID) async throws -> Data
+    // Clear entire vault
+    func clearVault() throws
+
+    // Statistics
+    var statistics: VaultStatistics  // photoCount, totalSize, formattedSize
 }
 ```
+
+### 4.3.1 Vault View Multi-Select & Share
+
+The VaultView supports multi-select mode for batch operations:
+
+```swift
+// VaultView.swift - Multi-select state
+@State private var isSelectionMode = false
+@State private var selectedPhotoIds: Set<UUID> = []
+
+// Selection toggle on photo tap
+func toggleSelection(_ id: UUID) {
+    if selectedPhotoIds.contains(id) {
+        selectedPhotoIds.remove(id)
+    } else {
+        selectedPhotoIds.insert(id)
+    }
+}
+```
+
+**Share Sheet Integration:**
+```swift
+// ShareSheet.swift - UIActivityViewController wrapper
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+```
+
+**Supported Share Destinations:**
+- AirDrop
+- iMessage / SMS
+- WhatsApp, Telegram, etc.
+- Email
+- Save to Files
+- Copy to clipboard
+- Third-party apps
 
 **Storage Structure:**
 ```
@@ -413,6 +459,46 @@ class CryptoService {
               │SecurePhoto  │
               │   View      │
               └─────────────┘
+```
+
+### 5.4 Photo Share Flow
+
+```
+┌────────┐     ┌─────────────┐     ┌────────────┐
+│  User  │────▶│  VaultView  │────▶│  Select    │
+│        │     │ tap Select  │     │  Photos    │
+└────────┘     └─────────────┘     └────────────┘
+                     │                   │
+                     │                   ▼
+                     │           ┌──────────────┐
+                     │           │ selectedIds  │
+                     │           │ Set<UUID>    │
+                     │           └──────────────┘
+                     │                   │
+                     ▼                   │
+              ┌─────────────┐            │
+              │ Tap Share   │◀───────────┘
+              │   Button    │
+              └─────────────┘
+                     │
+                     ▼
+              ┌─────────────┐     ┌────────────┐
+              │VaultService │────▶│CryptoService│
+              │ getPhoto()  │     │ decrypt()  │
+              └─────────────┘     └────────────┘
+                     │
+                     ▼ (for each selected photo)
+              ┌──────────────┐
+              │ [UIImage]    │
+              │  array       │
+              └──────────────┘
+                     │
+                     ▼
+              ┌─────────────────────────────────┐
+              │         ShareSheet              │
+              │  (UIActivityViewController)     │
+              │  AirDrop, iMessage, Email, etc. │
+              └─────────────────────────────────┘
 ```
 
 ---
