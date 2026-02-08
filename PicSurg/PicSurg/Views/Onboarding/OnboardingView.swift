@@ -11,9 +11,10 @@ struct OnboardingView: View {
     @State private var pin = ""
     @State private var confirmPin = ""
     @State private var pinError = ""
+    @State private var recoveryEmail = ""
     @State private var enableBiometric = true
 
-    private let totalSteps = 4
+    private let totalSteps = 5
 
     var body: some View {
         VStack {
@@ -34,26 +35,40 @@ struct OnboardingView: View {
                     .tag(0)
 
                 // Step 2: Photo Permission
-                PermissionStep(photoService: photoService, onContinue: { currentStep = 2 })
-                    .tag(1)
+                PermissionStep(
+                    photoService: photoService,
+                    onBack: { currentStep = 0 },
+                    onContinue: { currentStep = 2 }
+                )
+                .tag(1)
 
                 // Step 3: PIN Setup
                 PINSetupStep(
                     pin: $pin,
                     confirmPin: $confirmPin,
                     error: $pinError,
+                    onBack: { currentStep = 1 },
                     onContinue: { setupPIN() }
                 )
                 .tag(2)
 
-                // Step 4: Biometric
+                // Step 4: Recovery Email
+                RecoveryEmailStep(
+                    email: $recoveryEmail,
+                    onBack: { currentStep = 2 },
+                    onContinue: { saveRecoveryEmail() }
+                )
+                .tag(3)
+
+                // Step 5: Biometric
                 BiometricStep(
                     enableBiometric: $enableBiometric,
                     biometricName: authService.biometricName,
                     isAvailable: authService.isBiometricAvailable,
+                    onBack: { currentStep = 3 },
                     onComplete: { completeOnboarding() }
                 )
-                .tag(3)
+                .tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.easeInOut, value: currentStep)
@@ -78,6 +93,14 @@ struct OnboardingView: View {
         } catch {
             pinError = "Failed to save PIN"
         }
+    }
+
+    private func saveRecoveryEmail() {
+        // Save email if provided (not required)
+        if !recoveryEmail.isEmpty {
+            authService.recoveryEmail = recoveryEmail
+        }
+        currentStep = 4
     }
 
     private func completeOnboarding() {
@@ -178,10 +201,24 @@ struct FeatureRow: View {
 
 struct PermissionStep: View {
     @ObservedObject var photoService: PhotoService
+    let onBack: () -> Void
     let onContinue: () -> Void
 
     var body: some View {
         VStack(spacing: 30) {
+            // Back button
+            HStack {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Theme.Colors.primary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+
             Spacer()
 
             Image(systemName: "photo.on.rectangle.angled")
@@ -237,13 +274,33 @@ struct PINSetupStep: View {
     @Binding var pin: String
     @Binding var confirmPin: String
     @Binding var error: String
+    let onBack: () -> Void
     let onContinue: () -> Void
 
     @State private var isConfirming = false
-    @State private var showWarning = false
 
     var body: some View {
         VStack(spacing: 24) {
+            // Back button
+            HStack {
+                Button(action: {
+                    // Reset PIN state when going back
+                    pin = ""
+                    confirmPin = ""
+                    error = ""
+                    isConfirming = false
+                    onBack()
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Theme.Colors.primary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+
             Spacer()
 
             Image(systemName: "lock.fill")
@@ -258,25 +315,6 @@ struct PINSetupStep: View {
                 .multilineTextAlignment(.center)
                 .foregroundColor(.secondary)
                 .padding(.horizontal, 40)
-
-            // PIN Recovery Warning
-            if !isConfirming {
-                Button {
-                    showWarning = true
-                } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundColor(.orange)
-                        Text("Important: No PIN recovery")
-                            .font(.subheadline)
-                            .foregroundColor(.orange)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background(Color.orange.opacity(0.15))
-                    .cornerRadius(8)
-                }
-            }
 
             // PIN Dots
             HStack(spacing: 20) {
@@ -330,11 +368,6 @@ struct PINSetupStep: View {
             Spacer()
         }
         .padding()
-        .alert("No PIN Recovery", isPresented: $showWarning) {
-            Button("I Understand", role: .cancel) {}
-        } message: {
-            Text("If you forget your PIN, there is NO way to recover your secured photos. Your encrypted data will be permanently lost.\n\nPlease choose a PIN you will remember, or store it securely.")
-        }
     }
 
     private func addDigit(_ digit: String) {
@@ -369,14 +402,128 @@ struct PINSetupStep: View {
     }
 }
 
+struct RecoveryEmailStep: View {
+    @Binding var email: String
+    let onBack: () -> Void
+    let onContinue: () -> Void
+
+    @FocusState private var isEmailFocused: Bool
+
+    var isValidEmail: Bool {
+        let emailRegex = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
+        return email.range(of: emailRegex, options: .regularExpression) != nil
+    }
+
+    var body: some View {
+        VStack(spacing: 24) {
+            // Back button
+            HStack {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Theme.Colors.primary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+
+            Spacer()
+
+            Image(systemName: "envelope.badge.shield.half.filled")
+                .font(.system(size: 70))
+                .foregroundColor(Theme.Colors.primary)
+
+            Text("Recovery Email")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Add an email to recover your PIN if you forget it. A code will be sent to reset your PIN.")
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 40)
+
+            // Email input
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("Email address", text: $email)
+                    .keyboardType(.emailAddress)
+                    .textContentType(.emailAddress)
+                    .autocapitalization(.none)
+                    .autocorrectionDisabled()
+                    .focused($isEmailFocused)
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(12)
+
+                if !email.isEmpty && !isValidEmail {
+                    Text("Please enter a valid email address")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
+            }
+            .padding(.horizontal, 40)
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                Button(action: {
+                    isEmailFocused = false
+                    onContinue()
+                }) {
+                    Text(email.isEmpty ? "Skip for Now" : "Continue")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(email.isEmpty || isValidEmail ? Theme.Colors.primary : Color.gray)
+                        .cornerRadius(12)
+                }
+                .disabled(!email.isEmpty && !isValidEmail)
+
+                if !email.isEmpty {
+                    Button(action: {
+                        email = ""
+                        isEmailFocused = false
+                        onContinue()
+                    }) {
+                        Text("Skip for Now")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+        .onAppear {
+            isEmailFocused = true
+        }
+    }
+}
+
 struct BiometricStep: View {
     @Binding var enableBiometric: Bool
     let biometricName: String
     let isAvailable: Bool
+    let onBack: () -> Void
     let onComplete: () -> Void
 
     var body: some View {
         VStack(spacing: 30) {
+            // Back button
+            HStack {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Theme.Colors.primary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+
             Spacer()
 
             Image(systemName: biometricName == "Face ID" ? "faceid" : "touchid")

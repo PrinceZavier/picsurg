@@ -130,14 +130,17 @@ final class AppState: ObservableObject {
 
     // MARK: - Batch Scanning State
 
-    /// Date of oldest photo that has been scanned (for continuing from where we left off)
-    @Published var oldestScannedPhotoDate: Date?
+    /// Set of photo identifiers that have been scanned
+    private var scannedPhotoIds: Set<String> = []
 
     /// Total photos in library (for progress display)
     @Published var totalLibraryPhotos: Int = 0
 
     /// Total photos scanned across all sessions
     @Published var totalPhotosScanned: Int = 0
+
+    /// Whether the initial full library scan has been completed
+    @Published var hasCompletedInitialScan: Bool = false
 
     // MARK: - Activity Feed
 
@@ -172,8 +175,9 @@ final class AppState: ObservableObject {
     private static let onboardingCompleteKey = "com.picsurg.onboardingComplete"
     private static let lastScanDateKey = "com.picsurg.lastScanDate"
     private static let recentActivityKey = "com.picsurg.recentActivity"
-    private static let oldestScannedDateKey = "com.picsurg.oldestScannedDate"
+    private static let scannedPhotoIdsKey = "com.picsurg.scannedPhotoIds"
     private static let totalScannedKey = "com.picsurg.totalScanned"
+    private static let initialScanCompleteKey = "com.picsurg.initialScanComplete"
 
     // MARK: - Singleton
 
@@ -197,11 +201,12 @@ final class AppState: ObservableObject {
             recentActivity = activities
         }
 
-        // Load batch scanning state
-        if let oldestScannedInterval = UserDefaults.standard.object(forKey: Self.oldestScannedDateKey) as? TimeInterval {
-            oldestScannedPhotoDate = Date(timeIntervalSince1970: oldestScannedInterval)
+        // Load scanned photo IDs
+        if let idsArray = UserDefaults.standard.array(forKey: Self.scannedPhotoIdsKey) as? [String] {
+            scannedPhotoIds = Set(idsArray)
         }
         totalPhotosScanned = UserDefaults.standard.integer(forKey: Self.totalScannedKey)
+        hasCompletedInitialScan = UserDefaults.standard.bool(forKey: Self.initialScanCompleteKey)
     }
 
     func setOnboardingComplete() {
@@ -216,35 +221,42 @@ final class AppState: ObservableObject {
 
     // MARK: - Batch Scanning
 
-    /// Update batch scan progress after scanning a batch of photos
-    func updateBatchScanProgress(oldestPhotoDate: Date, photosScanned: Int) {
-        // Only update if this is an older date than we've seen
-        if oldestScannedPhotoDate == nil || oldestPhotoDate < oldestScannedPhotoDate! {
-            oldestScannedPhotoDate = oldestPhotoDate
-            UserDefaults.standard.set(oldestPhotoDate.timeIntervalSince1970, forKey: Self.oldestScannedDateKey)
-        }
+    /// Check if a photo has already been scanned
+    func hasScannedPhoto(id: String) -> Bool {
+        scannedPhotoIds.contains(id)
+    }
 
-        totalPhotosScanned += photosScanned
+    /// Mark photos as scanned
+    func markPhotosAsScanned(ids: [String]) {
+        scannedPhotoIds.formUnion(ids)
+        totalPhotosScanned = scannedPhotoIds.count
+        saveScannedPhotoIds()
+    }
+
+    /// Mark initial scan as complete
+    func markInitialScanComplete() {
+        hasCompletedInitialScan = true
+        UserDefaults.standard.set(true, forKey: Self.initialScanCompleteKey)
+    }
+
+    private func saveScannedPhotoIds() {
+        UserDefaults.standard.set(Array(scannedPhotoIds), forKey: Self.scannedPhotoIdsKey)
         UserDefaults.standard.set(totalPhotosScanned, forKey: Self.totalScannedKey)
     }
 
     /// Reset batch scanning progress (e.g., when starting fresh)
     func resetBatchScanProgress() {
-        oldestScannedPhotoDate = nil
+        scannedPhotoIds.removeAll()
         totalPhotosScanned = 0
-        UserDefaults.standard.removeObject(forKey: Self.oldestScannedDateKey)
+        hasCompletedInitialScan = false
+        UserDefaults.standard.removeObject(forKey: Self.scannedPhotoIdsKey)
         UserDefaults.standard.removeObject(forKey: Self.totalScannedKey)
+        UserDefaults.standard.removeObject(forKey: Self.initialScanCompleteKey)
     }
 
-    /// Calculate scan coverage percentage
-    var scanCoveragePercent: Int {
-        guard totalLibraryPhotos > 0 else { return 0 }
-        return min(100, Int((Double(totalPhotosScanned) / Double(totalLibraryPhotos)) * 100))
-    }
-
-    /// Check if there are more photos to scan
-    var hasUnscannedPhotos: Bool {
-        totalLibraryPhotos > totalPhotosScanned
+    /// Get IDs of photos that haven't been scanned yet
+    func getUnscannedPhotoIds(from allIds: [String]) -> [String] {
+        allIds.filter { !scannedPhotoIds.contains($0) }
     }
 
     // MARK: - Activity Logging
@@ -282,5 +294,10 @@ final class AppState: ObservableObject {
         UserDefaults.standard.removeObject(forKey: Self.onboardingCompleteKey)
         UserDefaults.standard.removeObject(forKey: Self.lastScanDateKey)
         UserDefaults.standard.removeObject(forKey: Self.recentActivityKey)
+    }
+
+    /// Get the last scan activity for display
+    var lastScanActivity: ActivityItem? {
+        recentActivity.first { $0.type == .scanned }
     }
 }

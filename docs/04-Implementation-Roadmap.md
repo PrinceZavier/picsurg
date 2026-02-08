@@ -1,8 +1,8 @@
 # PicSurg - Implementation Roadmap
 
-**Version:** 1.0
-**Last Updated:** January 2026
-**Status:** MVP Complete
+**Version:** 1.1
+**Last Updated:** February 7, 2026
+**Status:** MVP Complete + Enhancements
 
 ---
 
@@ -23,7 +23,8 @@ This roadmap breaks down PicSurg development into phases. The goal is to get a w
 | **Phase 2** | Photo Scanning | ✅ Complete |
 | **Phase 3** | Integration | ✅ Complete |
 | **Phase 4** | Polish | ✅ Complete |
-| **Future** | Enhancements | Planned |
+| **Phase 5** | Feb 2026 Enhancements | ✅ Complete |
+| **Future** | Planned Enhancements | Planned |
 
 ---
 
@@ -269,52 +270,106 @@ See detailed explanations in [05-Technical-Decisions.md](05-Technical-Decisions.
 
 ---
 
-## 8. Future Enhancements (Post-MVP)
+## 8. Phase 5: February 2026 Enhancements ✅
 
-### 8.1 Batch Scanning for Large Libraries
-GitHub Issue: #31
-- [ ] Remember scan progress across sessions
+**Goal**: Improve UX, add batch scanning, PIN recovery, and modernize UI.
+
+### Tasks
+
+#### 5.1 Onboarding Improvements ✅
+- [x] Add back navigation buttons to onboarding steps
+- [x] Fix photo permission popup timing (only appears when "Grant Access" tapped)
+- [x] Add recovery email step (step 4 of 5)
+- [x] Update step indicators (5 steps total)
+
+#### 5.2 Lock Screen Branding ✅
+- [x] Add app logo with teal glow effect
+- [x] Apply Theme.Colors.primary to title and PIN dots
+- [x] Add "Forgot PIN?" button (shows if recovery email set)
+- [x] Implement PIN recovery flow (3 steps: confirm, enter code, new PIN)
+
+#### 5.3 Home Screen Cleanup ✅
+- [x] Remove clutter (storage stats, secured count, quick action buttons)
+- [x] Show last scan date subtly below scan button
+- [x] Add three-line hamburger menu in upper right
+- [x] Menu options: Open Photos, Settings, Photo Access Settings
+
+#### 5.4 Batch Scanning ✅
+- [x] Scan photos in batches of 100 to prevent memory issues
+- [x] Track scanned photo IDs across sessions (via UserDefaults)
+- [x] First scan covers entire library in batches
+- [x] Subsequent scans only process new/unscanned photos
+- [x] Skip already-secured vault photos during scan
+
+#### 5.5 PIN Recovery System ✅
+- [x] Add recovery email to AuthService
+- [x] Generate 6-digit recovery code (15-minute expiry)
+- [x] Verify code and reset lockout/failed attempts
+- [x] Allow setting new PIN after successful recovery
+- [x] Mask email display for privacy (e.g., "j***@gmail.com")
+
+#### 5.6 Vault UI Modernization ✅
+- [x] Update to Apple Photos-style interface
+- [x] Icon-based toolbar (share, trash, ellipsis menu)
+- [x] "X Photos Selected" header in selection mode
+- [x] Add "Restore to Camera Roll" option in menu
+- [x] Remove colored button styling for cleaner look
+
+### Deliverables
+- ✅ Streamlined onboarding with back navigation
+- ✅ Branded lock screen with PIN recovery
+- ✅ Clean home screen with menu
+- ✅ Batch scanning for large libraries
+- ✅ Modern Apple Photos-style vault UI
+
+---
+
+## 9. Future Enhancements (Post-MVP)
+
+### 9.1 Batch Scanning Enhancements
+- [x] Remember scan progress across sessions ✅ (Implemented Feb 2026)
 - [ ] "Scan Next 1000" functionality
 - [ ] Date range picker for targeted scanning
 - [ ] Progress tracker showing library coverage
 
-### 8.2 Background Scanning
+### 9.2 Background Scanning
 - [ ] Implement BGProcessingTask
 - [ ] Schedule periodic scans
 - [ ] Local notification when photos found
 - [ ] Battery-efficient implementation
 
-### 8.3 Manual Photo Addition
+### 9.3 Manual Photo Addition
 - [ ] "Add to Vault" option in review
 - [ ] Browse and select any photo
 - [ ] Useful for photos ML missed
 
-### 8.4 Export & Sharing
-- [ ] Export single photo (decrypted)
-- [ ] Share via AirDrop
-- [ ] Share via secure email
+### 9.4 Export & Sharing
+- [x] Export single photo (decrypted) ✅
+- [x] Share via AirDrop ✅
+- [x] Share via iOS Share Sheet ✅
+- [x] Restore photos to camera roll ✅ (Implemented Feb 2026)
 - [ ] Audit log for exports
 
-### 8.5 Organization Features
+### 9.5 Organization Features
 - [ ] Create folders/albums in vault
 - [ ] Tag photos
 - [ ] Search by date
 - [ ] Sort options
 
-### 8.6 Cloud Backup (Requires BAA)
+### 9.6 Cloud Backup (Requires BAA)
 - [ ] End-to-end encrypted backup
 - [ ] iCloud or custom server
 - [ ] Restore to new device
 - [ ] HIPAA BAA with provider
 
-### 8.7 Model Improvement
+### 9.7 Model Improvement
 - [ ] Collect user corrections (false positives/negatives)
 - [ ] Retrain model periodically
 - [ ] Improve accuracy over time
 
 ---
 
-## 9. Development Notes
+## 10. Development Notes
 
 ### Key Technical Decisions
 
@@ -345,7 +400,7 @@ Without a paid developer account:
 
 ---
 
-## 10. Success Criteria
+## 11. Success Criteria
 
 ### MVP Complete ✅
 

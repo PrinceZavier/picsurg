@@ -1,8 +1,8 @@
 # PicSurg - Technical Architecture Document
 
-**Version:** 1.0
-**Last Updated:** January 2026
-**Status:** Draft
+**Version:** 1.1
+**Last Updated:** February 7, 2026
+**Status:** MVP Complete
 
 ---
 
@@ -167,14 +167,19 @@ class PhotoService {
 
     // Delete photo from library (after securing)
     func deletePhoto(_ asset: PHAsset) async throws
+
+    // Save photo back to library (restore from vault)
+    func saveToPhotoLibrary(_ imageData: Data) async throws
 }
 ```
 
 **Key Considerations:**
 - Request `.readWrite` authorization for full access
 - Use `PHCachingImageManager` for efficient thumbnail loading
-- Fetch photos in batches to manage memory
+- Fetch photos in batches to manage memory (100 at a time)
 - Handle authorization state changes
+- Change observer only registered after authorization granted
+- Supports restoring photos from vault to camera roll
 
 ### 4.2 ML Service
 
@@ -289,7 +294,7 @@ Documents/
 
 ### 4.4 Auth Service
 
-Handles all authentication (Face ID, Touch ID, PIN).
+Handles all authentication (Face ID, Touch ID, PIN) and PIN recovery.
 
 ```swift
 // AuthService.swift - Key responsibilities
@@ -305,6 +310,14 @@ class AuthService {
     func verifyPIN(_ pin: String) -> Bool
     func changePIN(from old: String, to new: String) throws
 
+    // PIN Recovery
+    var recoveryEmail: String?
+    var hasRecoveryEmail: Bool
+    var maskedRecoveryEmail: String?  // "j***@gmail.com"
+    func generateRecoveryCode() -> String  // 6-digit, 15-min expiry
+    func verifyRecoveryCode(_ code: String) -> Bool
+    func resetPINAfterRecovery(_ newPIN: String) throws
+
     // Lock state
     var isLocked: Bool
     func lock()
@@ -313,10 +326,13 @@ class AuthService {
 ```
 
 **Security Implementation:**
-- PIN stored in Keychain (not UserDefaults)
+- PIN stored in Keychain using PBKDF2-HMAC-SHA256 (100,000 iterations)
+- 32-byte random salt per PIN
+- Constant-time comparison to prevent timing attacks
 - Use `LAContext` for biometric authentication
 - Require authentication on every app foreground
-- Implement attempt limiting with exponential backoff
+- Implement attempt limiting with exponential backoff (1min, 5min, 15min, 1hr)
+- Recovery codes stored temporarily with 15-minute expiry
 
 ### 4.5 Crypto Service
 

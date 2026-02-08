@@ -30,6 +30,9 @@ final class AuthService: ObservableObject {
     private static let biometricEnabledKey = "com.picsurg.auth.biometricEnabled"
     private static let failedAttemptsKey = "com.picsurg.auth.failedAttempts"
     private static let lockoutEndKey = "com.picsurg.auth.lockoutEnd"
+    private static let recoveryEmailKey = "com.picsurg.auth.recoveryEmail"
+    private static let recoveryCodeKey = "com.picsurg.auth.recoveryCode"
+    private static let recoveryCodeExpiryKey = "com.picsurg.auth.recoveryCodeExpiry"
 
     // MARK: - Singleton
 
@@ -189,6 +192,10 @@ final class AuthService: ObservableObject {
 
     enum AuthError: Error {
         case keyDerivationFailed
+        case recoveryEmailNotSet
+        case recoveryCodeExpired
+        case recoveryCodeInvalid
+        case emailSendFailed
     }
 
     /// Change PIN (requires old PIN verification)
@@ -204,6 +211,92 @@ final class AuthService: ObservableObject {
     func deletePIN() throws {
         try KeychainService.delete(forKey: Self.pinHashKey)
         try KeychainService.delete(forKey: Self.pinSaltKey)
+    }
+
+    // MARK: - Recovery Email
+
+    var recoveryEmail: String? {
+        get { UserDefaults.standard.string(forKey: Self.recoveryEmailKey) }
+        set {
+            if let email = newValue {
+                UserDefaults.standard.set(email, forKey: Self.recoveryEmailKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Self.recoveryEmailKey)
+            }
+        }
+    }
+
+    var hasRecoveryEmail: Bool {
+        recoveryEmail != nil && !(recoveryEmail?.isEmpty ?? true)
+    }
+
+    /// Mask email for display (e.g., "j***@gmail.com")
+    var maskedRecoveryEmail: String? {
+        guard let email = recoveryEmail, let atIndex = email.firstIndex(of: "@") else {
+            return nil
+        }
+        let localPart = String(email[..<atIndex])
+        let domain = String(email[atIndex...])
+
+        if localPart.count <= 2 {
+            return localPart + "***" + domain
+        } else {
+            let firstChar = localPart.prefix(1)
+            let lastChar = localPart.suffix(1)
+            return firstChar + "***" + lastChar + domain
+        }
+    }
+
+    /// Generate and store a 6-digit recovery code (valid for 15 minutes)
+    func generateRecoveryCode() -> String {
+        let code = String(format: "%06d", Int.random(in: 0...999999))
+        UserDefaults.standard.set(code, forKey: Self.recoveryCodeKey)
+        let expiry = Date().addingTimeInterval(15 * 60) // 15 minutes
+        UserDefaults.standard.set(expiry.timeIntervalSince1970, forKey: Self.recoveryCodeExpiryKey)
+        return code
+    }
+
+    /// Verify recovery code and reset PIN if valid
+    func verifyRecoveryCode(_ code: String) -> Bool {
+        guard let storedCode = UserDefaults.standard.string(forKey: Self.recoveryCodeKey),
+              let expiryInterval = UserDefaults.standard.object(forKey: Self.recoveryCodeExpiryKey) as? TimeInterval else {
+            return false
+        }
+
+        let expiry = Date(timeIntervalSince1970: expiryInterval)
+
+        // Check if expired
+        guard Date() < expiry else {
+            clearRecoveryCode()
+            return false
+        }
+
+        // Check if code matches
+        guard code == storedCode else {
+            return false
+        }
+
+        // Clear the code after successful verification
+        clearRecoveryCode()
+
+        // Reset lockout and failed attempts
+        failedAttempts = 0
+        lockoutEndTime = nil
+        saveFailedAttempts()
+        UserDefaults.standard.removeObject(forKey: Self.lockoutEndKey)
+
+        return true
+    }
+
+    /// Reset PIN after recovery verification (call this after verifyRecoveryCode returns true)
+    func resetPINAfterRecovery(_ newPIN: String) throws {
+        try setPIN(newPIN)
+        unlock()
+    }
+
+    private func clearRecoveryCode() {
+        UserDefaults.standard.removeObject(forKey: Self.recoveryCodeKey)
+        UserDefaults.standard.removeObject(forKey: Self.recoveryCodeExpiryKey)
     }
 
     // MARK: - Biometric Authentication

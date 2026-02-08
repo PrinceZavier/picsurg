@@ -17,6 +17,9 @@ struct VaultView: View {
     @State private var showingShareSheet = false
     @State private var photosToShare: [UIImage] = []
     @State private var isPreparingShare = false
+    @State private var isRestoring = false
+    @State private var showingRestoreSuccess = false
+    @State private var restoreSuccessCount = 0
 
     private var selectedCount: Int {
         selectedPhotoIds.count
@@ -48,21 +51,30 @@ struct VaultView: View {
                     selectionActionBar
                 }
             }
-            .navigationTitle("Vault")
             .toolbar {
-                // Left side - selection count or photo count
+                // Left side - selection count (Apple style) or title
                 ToolbarItem(placement: .navigationBarLeading) {
                     if isSelectionMode {
-                        Text("\(selectedCount) selected")
-                            .foregroundColor(.secondary)
-                            .font(.callout)
+                        Text("\(selectedCount) Photo\(selectedCount == 1 ? "" : "s") Selected")
+                            .font(.headline)
+                    } else {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Vault")
+                                .font(.largeTitle)
+                                .fontWeight(.bold)
+                            if !photos.isEmpty {
+                                Text("\(photos.count) Item\(photos.count == 1 ? "" : "s")")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
                 }
 
-                // Right side - Select/Done button
+                // Right side - Select/Done button (Apple style uses Cancel in selection mode)
                 ToolbarItem(placement: .navigationBarTrailing) {
                     if !photos.isEmpty && !isLoading {
-                        Button(isSelectionMode ? "Done" : "Select") {
+                        Button(isSelectionMode ? "Cancel" : "Select") {
                             Haptics.light()
                             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                                 isSelectionMode.toggle()
@@ -71,9 +83,11 @@ struct VaultView: View {
                                 }
                             }
                         }
+                        .foregroundColor(Theme.Colors.primary)
                     }
                 }
             }
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 loadPhotos()
             }
@@ -98,9 +112,29 @@ struct VaultView: View {
             } message: {
                 Text("This will permanently delete the selected photo\(selectedCount == 1 ? "" : "s") from your vault. This cannot be undone.")
             }
+            .alert("Photos Restored", isPresented: $showingRestoreSuccess) {
+                Button("OK") {}
+            } message: {
+                Text("\(restoreSuccessCount) photo\(restoreSuccessCount == 1 ? "" : "s") saved to your camera roll.")
+            }
             .overlay {
-                if isPreparingShare {
-                    preparingShareOverlay
+                if isPreparingShare || isRestoring {
+                    ZStack {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+
+                        VStack(spacing: 16) {
+                            ProgressView()
+                                .scaleEffect(1.2)
+                            Text(isRestoring ? "Restoring photos..." : "Preparing photos...")
+                                .font(.callout)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(24)
+                        .background(Color(UIColor.systemBackground))
+                        .cornerRadius(16)
+                        .shadow(radius: 10)
+                    }
                 }
             }
         }
@@ -177,79 +211,76 @@ struct VaultView: View {
     }
 
     private var selectionActionBar: some View {
-        VStack(spacing: 12) {
-            // Select All / Deselect All
+        VStack(spacing: 0) {
+            Divider()
+
             HStack {
-                Button("Select All") {
-                    Haptics.light()
-                    selectedPhotoIds = Set(photos.map { $0.id })
-                }
-                .font(.callout)
-
-                Spacer()
-
-                Button("Deselect All") {
-                    Haptics.light()
-                    selectedPhotoIds.removeAll()
-                }
-                .font(.callout)
-            }
-            .padding(.horizontal)
-
-            // Action buttons
-            HStack(spacing: 15) {
-                // Share button
+                // Share button (left)
                 Button {
                     shareSelectedPhotos()
                 } label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .font(.headline)
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.title2)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(selectedCount > 0 ? Theme.Colors.primary : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(Theme.Radius.medium)
+                        .frame(height: 44)
                 }
                 .disabled(selectedCount == 0)
+                .foregroundColor(selectedCount > 0 ? .primary : .gray)
 
-                // Delete button
+                Spacer()
+
+                // Select All / Deselect All (center)
+                if selectedPhotoIds.count == photos.count {
+                    Button("Deselect All") {
+                        Haptics.light()
+                        selectedPhotoIds.removeAll()
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                } else {
+                    Button("Select All") {
+                        Haptics.light()
+                        selectedPhotoIds = Set(photos.map { $0.id })
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+                }
+
+                Spacer()
+
+                // Delete button (right)
                 Button {
                     showingDeleteConfirmation = true
                 } label: {
-                    Label("Delete", systemImage: "trash")
-                        .font(.headline)
+                    Image(systemName: "trash")
+                        .font(.title2)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(selectedCount > 0 ? Theme.Colors.error : Color.gray)
-                        .foregroundColor(.white)
-                        .cornerRadius(Theme.Radius.medium)
+                        .frame(height: 44)
                 }
                 .disabled(selectedCount == 0)
-            }
-            .padding(.horizontal)
-        }
-        .padding(.vertical)
-        .background(Color(UIColor.systemBackground))
-        .transition(.move(edge: .bottom).combined(with: .opacity))
-    }
+                .foregroundColor(selectedCount > 0 ? .primary : .gray)
 
-    private var preparingShareOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-
-            VStack(spacing: 16) {
-                ProgressView()
-                    .scaleEffect(1.2)
-                Text("Preparing photos...")
-                    .font(.callout)
-                    .foregroundColor(.secondary)
+                // More options button
+                Menu {
+                    Button {
+                        restoreSelectedPhotos()
+                    } label: {
+                        Label("Restore to Camera Roll", systemImage: "arrow.uturn.backward.circle")
+                    }
+                    .disabled(selectedCount == 0)
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.title2)
+                        .frame(width: 44, height: 44)
+                }
+                .foregroundColor(selectedCount > 0 ? .primary : .gray)
+                .disabled(selectedCount == 0)
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
             .background(Color(UIColor.systemBackground))
-            .cornerRadius(16)
-            .shadow(radius: 10)
         }
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     // MARK: - Actions
@@ -397,6 +428,41 @@ struct VaultView: View {
 
                     photosToShare = images
                     showingShareSheet = true
+                }
+            }
+        }
+    }
+
+    private func restoreSelectedPhotos() {
+        isRestoring = true
+
+        Task {
+            var successCount = 0
+
+            for id in selectedPhotoIds {
+                do {
+                    let data = try VaultService.shared.getPhoto(id: id)
+                    try await PhotoService.shared.saveToPhotoLibrary(data)
+                    successCount += 1
+                } catch {
+                    print("Failed to restore photo: \(error)")
+                }
+            }
+
+            await MainActor.run {
+                isRestoring = false
+
+                if successCount > 0 {
+                    Haptics.success()
+                    appState.logActivity(.restored, count: successCount)
+                    restoreSuccessCount = successCount
+                    showingRestoreSuccess = true
+                    selectedPhotoIds.removeAll()
+                    isSelectionMode = false
+                } else {
+                    Haptics.error()
+                    errorMessage = "Could not restore photos. Please check your photo library permissions."
+                    showingError = true
                 }
             }
         }

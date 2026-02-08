@@ -1,8 +1,8 @@
 # PicSurg - Product Requirements Document (PRD)
 
-**Version:** 1.0
-**Last Updated:** January 2026
-**Status:** Draft
+**Version:** 1.1
+**Last Updated:** February 7, 2026
+**Status:** MVP Complete
 
 ---
 
@@ -87,6 +87,7 @@ An intelligent iOS app that:
 | **Fallback** | PIN required as backup for biometric |
 | **Lock Timing** | Immediate lock when app backgrounds |
 | **Failed Attempts** | Lock for increasing duration after failures |
+| **PIN Recovery** | Recovery email with 6-digit code (15-min expiry) |
 | **Priority** | P0 - Critical |
 
 #### F5: Photo Removal from Camera Roll
@@ -175,19 +176,19 @@ An intelligent iOS app that:
 
 ### 5.1 Screens
 
-#### Screen 1: Onboarding
+#### Screen 1: Onboarding (5 steps)
 - Welcome/intro explaining app purpose
 - Request photo library permissions
 - Set up PIN (required)
+- Recovery email setup (optional but recommended)
 - Enable Face ID/Touch ID (optional but recommended)
-- Initial scan prompt
 
 #### Screen 2: Home/Dashboard
-- "Scan Now" button
-- Last scan date/time
-- Count of photos in vault
-- Quick access to vault
-- Pending reviews badge
+- Clean, minimal design with app logo
+- "Scan Photos" / "Scan New Photos" button
+- Last scan date/time (subtle display)
+- Three-line menu with: Open Photos, Settings, Photo Access Settings
+- Batch scanning (100 photos at a time, tracks scanned photos)
 
 #### Screen 3: Scan Results / Review
 - Grid of identified surgical photos
@@ -198,19 +199,28 @@ An intelligent iOS app that:
 - Individual photo detail view on tap
 
 #### Screen 4: Secure Vault
-- Grid of secured photos
-- Organized by date (sections)
-- Full-screen viewer on tap
-- Photo count and storage used
+- Grid of secured photos (Apple Photos-style interface)
+- Modern icon-based toolbar (share, delete, more options)
+- Full-screen viewer on tap with pinch-to-zoom
+- Photo count display ("X Items")
 - **Multi-select mode**: Select multiple photos for batch operations
 - **Share functionality**: Export selected photos via iOS Share Sheet
 - **Batch delete**: Delete multiple photos at once
+- **Restore to Camera Roll**: Return photos to photo library
 
 #### Screen 5: Settings
-- Authentication settings (PIN change, biometric toggle)
-- Scan settings (auto-scan frequency)
+- Authentication settings (PIN change, biometric toggle, recovery email)
+- Scan settings (reset scan history)
 - About/Help
 - Delete all data option
+
+#### Screen 6: Lock Screen
+- App logo with teal glow effect (matching branding)
+- PIN entry with number pad
+- Face ID / Touch ID prompt (auto-triggers on appear)
+- "Forgot PIN?" recovery option (if recovery email set)
+- Lockout timer display after failed attempts
+- PIN Recovery flow: generate code → verify → set new PIN
 
 ### 5.2 Design Principles
 - Medical/professional aesthetic (clean, trustworthy)
@@ -289,7 +299,7 @@ An intelligent iOS app that:
 1. ~~**Training Data**: How should user-provided training photos be labeled? Need clear categories.~~ **RESOLVED** - Model already trained (`PicSurge V1 1.mlmodel`)
 2. **False Negatives**: What happens to surgical photos the ML misses? Manual add feature priority?
 3. **Compliance Audit**: Should we consult HIPAA compliance expert before launch?
-4. **Recovery**: If user forgets PIN and biometric fails, what's the recovery path?
+4. ~~**Recovery**: If user forgets PIN and biometric fails, what's the recovery path?~~ **RESOLVED** - Recovery email with 6-digit code implemented
 
 ---
 

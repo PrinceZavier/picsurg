@@ -32,7 +32,11 @@ final class PhotoService: ObservableObject {
 
     private init() {
         authorizationStatus = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        setupChangeObserver()
+        // Only register change observer if we already have access
+        // Otherwise, wait until authorization is granted
+        if canAccessPhotos {
+            setupChangeObserver()
+        }
     }
 
     // MARK: - Change Observer
@@ -60,6 +64,10 @@ final class PhotoService: ObservableObject {
         let status = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
         await MainActor.run {
             self.authorizationStatus = status
+            // Set up change observer now that we have access
+            if self.canAccessPhotos && self.changeObserver == nil {
+                self.setupChangeObserver()
+            }
         }
         return status
     }
