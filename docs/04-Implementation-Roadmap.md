@@ -1,8 +1,8 @@
 # PicSurg - Implementation Roadmap
 
-**Version:** 1.1
-**Last Updated:** February 7, 2026
-**Status:** MVP Complete + Enhancements
+**Version:** 1.2
+**Last Updated:** March 2, 2026
+**Status:** MVP Complete + Phase 6 Enhancements
 
 ---
 
@@ -24,6 +24,7 @@ This roadmap breaks down PicSurg development into phases. The goal is to get a w
 | **Phase 3** | Integration | ✅ Complete |
 | **Phase 4** | Polish | ✅ Complete |
 | **Phase 5** | Feb 2026 Enhancements | ✅ Complete |
+| **Phase 6** | March 2026 Enhancements | ✅ Complete |
 | **Future** | Planned Enhancements | Planned |
 
 ---
@@ -239,11 +240,11 @@ See detailed explanations in [05-Technical-Decisions.md](05-Technical-Decisions.
 | ML model fails in simulator | Mock results for UI testing |
 
 #### 4.3 UI Polish
-- [ ] Add app icon
+- [x] Add app icon ✅ (Updated March 2026)
 - [ ] Add launch screen
-- [ ] Improve visual design
+- [x] Improve visual design ✅ (Shazam-style home, March 2026)
 - [x] Dark Mode support (uses system colors)
-- [ ] Add haptic feedback
+- [x] Add haptic feedback ✅ (Haptics utility, March 2026)
 - [x] Add loading states
 
 #### 4.4 Settings ✅
@@ -324,52 +325,116 @@ See detailed explanations in [05-Technical-Decisions.md](05-Technical-Decisions.
 
 ---
 
-## 9. Future Enhancements (Post-MVP)
+## 9. Phase 6: March 2026 Enhancements ✅
 
-### 9.1 Batch Scanning Enhancements
+**Goal**: Add Shazam-style scan UI, manual photo addition, scan reminders, auto-wipe, session management, and PBKDF2 PIN security.
+
+### Tasks
+
+#### 6.1 Shazam-Style Home Screen ✅
+- [x] Replace scan button with interactive logo (ScanButtonView)
+- [x] Pulsing glow rings and spinning animation during scan
+- [x] "Tap to PicSurg" / "Scanning..." text states
+- [x] Updated app icon and logo assets
+
+#### 6.2 Manual Photo Addition ✅
+- [x] Add PhotosPicker integration to HomeView (up to 50 photos)
+- [x] Confirmation dialog before securing photos
+- [x] Encrypt and add to vault, then delete from camera roll
+- [x] Success/error feedback with photo count
+- [x] Add "Add Photos Manually" to hamburger menu
+
+#### 6.3 Scan Reminders ✅
+- [x] Create `ReminderService.swift` (singleton, ObservableObject)
+- [x] Daily and weekly reminder frequency options
+- [x] Configurable time and weekday
+- [x] UNUserNotifications integration with permission handling
+- [x] Settings UI with toggle, frequency picker, time picker, weekday picker
+- [x] Reset all reminders on app reset / auto-wipe
+
+#### 6.4 PBKDF2 PIN Security ✅
+- [x] Upgrade PIN hashing from SHA-256 to PBKDF2-HMAC-SHA256 (100K iterations)
+- [x] 32-byte random salt per PIN stored in Keychain
+- [x] Constant-time comparison to prevent timing attacks
+- [x] Added `AuthError` enum for key derivation failures
+
+#### 6.5 Auto-Wipe on Failed Attempts ✅
+- [x] Configurable auto-wipe threshold (10, 15, 20, 25 attempts)
+- [x] Progressive warning levels (caution → danger → critical)
+- [x] Wipe clears vault, encryption key, reminders, app state, and PIN
+- [x] Confirmation dialog and info alert in Settings
+- [x] WipeWarningLevel enum for UI feedback
+
+#### 6.6 Session & Lock Management ✅
+- [x] Configurable grace period (immediate, 30s, 1min, 2min, 5min)
+- [x] Configurable inactivity timeout (1min, 2min, 5min, 15min, never)
+- [x] Background timestamp tracking for grace period
+- [x] Inactivity timer with auto-lock
+- [x] InactivityDetector view modifier for touch-based reset
+- [x] Settings section for Session & Lock controls
+
+#### 6.7 Theme & UI Enhancements ✅
+- [x] Added gradient glow color for scan button
+- [x] InactivityDetector view modifier
+- [x] Updated onboarding with refined step content
+- [x] Updated lock screen visuals
+
+### Deliverables
+- ✅ Shazam-style interactive scan experience
+- ✅ Manual photo addition to vault
+- ✅ Scan reminder notifications
+- ✅ PBKDF2 PIN security (upgrade from SHA-256)
+- ✅ Auto-wipe data protection
+- ✅ Configurable session lock management
+
+---
+
+## 10. Future Enhancements (Post-MVP)
+
+### 10.1 Batch Scanning Enhancements
 - [x] Remember scan progress across sessions ✅ (Implemented Feb 2026)
 - [ ] "Scan Next 1000" functionality
 - [ ] Date range picker for targeted scanning
 - [ ] Progress tracker showing library coverage
 
-### 9.2 Background Scanning
+### 10.2 Background Scanning
 - [ ] Implement BGProcessingTask
 - [ ] Schedule periodic scans
 - [ ] Local notification when photos found
 - [ ] Battery-efficient implementation
 
-### 9.3 Manual Photo Addition
-- [ ] "Add to Vault" option in review
-- [ ] Browse and select any photo
-- [ ] Useful for photos ML missed
+### 10.3 Manual Photo Addition
+- [x] Photo picker for manual vault addition ✅ (Implemented March 2026)
+- [x] Encrypt and remove from camera roll ✅
+- [ ] "Add to Vault" option in review screen
 
-### 9.4 Export & Sharing
+### 10.4 Export & Sharing
 - [x] Export single photo (decrypted) ✅
 - [x] Share via AirDrop ✅
 - [x] Share via iOS Share Sheet ✅
 - [x] Restore photos to camera roll ✅ (Implemented Feb 2026)
 - [ ] Audit log for exports
 
-### 9.5 Organization Features
+### 10.5 Organization Features
 - [ ] Create folders/albums in vault
 - [ ] Tag photos
 - [ ] Search by date
 - [ ] Sort options
 
-### 9.6 Cloud Backup (Requires BAA)
+### 10.6 Cloud Backup (Requires BAA)
 - [ ] End-to-end encrypted backup
 - [ ] iCloud or custom server
 - [ ] Restore to new device
 - [ ] HIPAA BAA with provider
 
-### 9.7 Model Improvement
+### 10.7 Model Improvement
 - [ ] Collect user corrections (false positives/negatives)
 - [ ] Retrain model periodically
 - [ ] Improve accuracy over time
 
 ---
 
-## 10. Development Notes
+## 11. Development Notes
 
 ### Key Technical Decisions
 
@@ -400,7 +465,7 @@ Without a paid developer account:
 
 ---
 
-## 11. Success Criteria
+## 12. Success Criteria
 
 ### MVP Complete ✅
 
@@ -420,5 +485,9 @@ Without a paid developer account:
 
 - [ ] Background scanning works
 - [x] Settings fully implemented
-- [ ] Polished UI with Dark Mode and app icon
+- [x] Polished UI with Dark Mode and app icon ✅
 - [x] Comprehensive error handling
+- [x] Manual photo addition ✅
+- [x] Scan reminders ✅
+- [x] Auto-wipe data protection ✅
+- [x] Session lock management ✅

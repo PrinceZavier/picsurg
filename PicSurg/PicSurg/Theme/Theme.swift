@@ -457,3 +457,27 @@ struct SkeletonView: View {
             .shimmer()
     }
 }
+
+// MARK: - Inactivity Detection
+
+struct InactivityDetector: ViewModifier {
+    let authService: AuthService
+
+    func body(content: Content) -> some View {
+        content
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 0)
+                    .onChanged { _ in
+                        if authService.isAuthenticated {
+                            authService.resetInactivityTimer()
+                        }
+                    }
+            )
+    }
+}
+
+extension View {
+    func detectInactivity(authService: AuthService) -> some View {
+        modifier(InactivityDetector(authService: authService))
+    }
+}

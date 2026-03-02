@@ -1,4 +1,6 @@
 import SwiftUI
+import Photos
+import PhotosUI
 
 /// Vault view showing secured photos with multi-select support
 struct VaultView: View {
@@ -14,12 +16,14 @@ struct VaultView: View {
     @State private var isSelectionMode = false
     @State private var selectedPhotoIds: Set<UUID> = []
     @State private var showingDeleteConfirmation = false
-    @State private var showingShareSheet = false
-    @State private var photosToShare: [UIImage] = []
     @State private var isPreparingShare = false
-    @State private var isRestoring = false
-    @State private var showingRestoreSuccess = false
-    @State private var restoreSuccessCount = 0
+    @State private var showingPhotoPicker = false
+    @State private var selectedPickerItems: [PhotosPickerItem] = []
+    @State private var isAddingPhotos = false
+    @State private var addedPhotosCount = 0
+    @State private var showingAddSuccess = false
+    @State private var pendingPickerItems: [PhotosPickerItem] = []
+    @State private var showingManualAddConfirm = false
 
     private var selectedCount: Int {
         selectedPhotoIds.count
@@ -51,28 +55,51 @@ struct VaultView: View {
                     selectionActionBar
                 }
             }
+            .navigationTitle(isSelectionMode ? "\(selectedCount) Photo\(selectedCount == 1 ? "" : "s") Selected" : "Vault")
             .toolbar {
-                // Left side - selection count (Apple style) or title
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if isSelectionMode {
-                        Text("\(selectedCount) Photo\(selectedCount == 1 ? "" : "s") Selected")
-                            .font(.headline)
-                    } else {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Vault")
-                                .font(.largeTitle)
-                                .fontWeight(.bold)
-                            if !photos.isEmpty {
-                                Text("\(photos.count) Item\(photos.count == 1 ? "" : "s")")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                // Right side - Menu button and Select/Cancel
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    if !isSelectionMode {
+                        // Hamburger menu
+                        Menu {
+                            Button {
+                                showingPhotoPicker = true
+                            } label: {
+                                Label("Add Photos Manually", systemImage: "plus.circle")
                             }
+
+                            Button {
+                                openPhotosApp()
+                            } label: {
+                                Label("Open Photos", systemImage: "photo.on.rectangle")
+                            }
+
+                            Button {
+                                appState.selectedTab = .home
+                            } label: {
+                                Label("Scan Photos", systemImage: "magnifyingglass")
+                            }
+
+                            Divider()
+
+                            NavigationLink {
+                                SettingsView()
+                            } label: {
+                                Label("Settings", systemImage: "gearshape")
+                            }
+
+                            Button {
+                                openAppSettings()
+                            } label: {
+                                Label("Photo Access Settings", systemImage: "lock.shield")
+                            }
+                        } label: {
+                            Image(systemName: "line.3.horizontal")
+                                .font(.title2)
+                                .foregroundColor(Theme.Colors.primary)
                         }
                     }
-                }
 
-                // Right side - Select/Done button (Apple style uses Cancel in selection mode)
-                ToolbarItem(placement: .navigationBarTrailing) {
                     if !photos.isEmpty && !isLoading {
                         Button(isSelectionMode ? "Cancel" : "Select") {
                             Haptics.light()
@@ -96,8 +123,13 @@ struct VaultView: View {
                     deletePhoto(photo)
                 })
             }
-            .sheet(isPresented: $showingShareSheet) {
-                ShareSheet(items: photosToShare)
+            .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedPickerItems, maxSelectionCount: 50, matching: .images)
+            .onChange(of: selectedPickerItems) { newItems in
+                if !newItems.isEmpty {
+                    pendingPickerItems = newItems
+                    selectedPickerItems = []
+                    showingManualAddConfirm = true
+                }
             }
             .alert("Error", isPresented: $showingError) {
                 Button("OK", role: .cancel) {}
@@ -112,13 +144,23 @@ struct VaultView: View {
             } message: {
                 Text("This will permanently delete the selected photo\(selectedCount == 1 ? "" : "s") from your vault. This cannot be undone.")
             }
-            .alert("Photos Restored", isPresented: $showingRestoreSuccess) {
+            .alert("Photos Added", isPresented: $showingAddSuccess) {
                 Button("OK") {}
             } message: {
-                Text("\(restoreSuccessCount) photo\(restoreSuccessCount == 1 ? "" : "s") saved to your camera roll.")
+                Text("\(addedPhotosCount) photo\(addedPhotosCount == 1 ? "" : "s") secured in your vault.")
+            }
+            .alert("Secure \(pendingPickerItems.count) Photo\(pendingPickerItems.count == 1 ? "" : "s")?", isPresented: $showingManualAddConfirm) {
+                Button("Cancel", role: .cancel) {
+                    pendingPickerItems = []
+                }
+                Button("Secure & Remove") {
+                    addPhotosManually(pendingPickerItems)
+                }
+            } message: {
+                Text("This will encrypt and remove \(pendingPickerItems.count == 1 ? "this photo" : "these photos") from your camera roll. For full privacy, empty your Recently Deleted folder afterwards.")
             }
             .overlay {
-                if isPreparingShare || isRestoring {
+                if isPreparingShare || isAddingPhotos {
                     ZStack {
                         Color.black.opacity(0.4)
                             .ignoresSafeArea()
@@ -126,7 +168,7 @@ struct VaultView: View {
                         VStack(spacing: 16) {
                             ProgressView()
                                 .scaleEffect(1.2)
-                            Text(isRestoring ? "Restoring photos..." : "Preparing photos...")
+                            Text(isAddingPhotos ? "Adding photos to vault..." : "Preparing photos...")
                                 .font(.callout)
                                 .foregroundColor(.secondary)
                         }
@@ -259,22 +301,6 @@ struct VaultView: View {
                 }
                 .disabled(selectedCount == 0)
                 .foregroundColor(selectedCount > 0 ? .primary : .gray)
-
-                // More options button
-                Menu {
-                    Button {
-                        restoreSelectedPhotos()
-                    } label: {
-                        Label("Restore to Camera Roll", systemImage: "arrow.uturn.backward.circle")
-                    }
-                    .disabled(selectedCount == 0)
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.title2)
-                        .frame(width: 44, height: 44)
-                }
-                .foregroundColor(selectedCount > 0 ? .primary : .gray)
-                .disabled(selectedCount == 0)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 8)
@@ -402,14 +428,15 @@ struct VaultView: View {
         isPreparingShare = true
 
         Task {
-            var images: [UIImage] = []
+            var urls: [URL] = []
+            let tempDir = FileManager.default.temporaryDirectory
 
-            for id in selectedPhotoIds {
+            for (index, id) in selectedPhotoIds.enumerated() {
                 do {
                     let data = try VaultService.shared.getPhoto(id: id)
-                    if let image = UIImage(data: data) {
-                        images.append(image)
-                    }
+                    let fileURL = tempDir.appendingPathComponent("vault_photo_\(index).jpg")
+                    try data.write(to: fileURL)
+                    urls.append(fileURL)
                 } catch {
                     print("Failed to load photo for sharing: \(error)")
                 }
@@ -418,50 +445,86 @@ struct VaultView: View {
             await MainActor.run {
                 isPreparingShare = false
 
-                if images.isEmpty {
+                if urls.isEmpty {
                     Haptics.error()
                     errorMessage = "Could not prepare photos for sharing."
                     showingError = true
                 } else {
-                    // Log activity
-                    appState.logActivity(.shared, count: images.count)
-
-                    photosToShare = images
-                    showingShareSheet = true
+                    appState.logActivity(.shared, count: urls.count)
+                    presentShareSheet(items: urls) {
+                        // Clean up temp files after share completes
+                        for url in urls {
+                            try? FileManager.default.removeItem(at: url)
+                        }
+                    }
                 }
             }
         }
     }
 
-    private func restoreSelectedPhotos() {
-        isRestoring = true
+    private func openPhotosApp() {
+        if let url = URL(string: "photos-redirect://") {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private func openAppSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    private func addPhotosManually(_ items: [PhotosPickerItem]) {
+        isAddingPhotos = true
+        pendingPickerItems = []
 
         Task {
             var successCount = 0
+            var assetIdentifiers: [String] = []
 
-            for id in selectedPhotoIds {
+            for item in items {
                 do {
-                    let data = try VaultService.shared.getPhoto(id: id)
-                    try await PhotoService.shared.saveToPhotoLibrary(data)
-                    successCount += 1
+                    if let data = try await item.loadTransferable(type: Data.self) {
+                        _ = try VaultService.shared.addPhoto(
+                            imageData: data,
+                            originalDate: Date()
+                        )
+                        successCount += 1
+                        if let assetId = item.itemIdentifier {
+                            assetIdentifiers.append(assetId)
+                        }
+                    }
                 } catch {
-                    print("Failed to restore photo: \(error)")
+                    print("Failed to add photo: \(error)")
+                }
+            }
+
+            // Delete originals from camera roll
+            if !assetIdentifiers.isEmpty {
+                let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIdentifiers, options: nil)
+                if fetchResult.count > 0 {
+                    do {
+                        try await PHPhotoLibrary.shared().performChanges {
+                            PHAssetChangeRequest.deleteAssets(fetchResult)
+                        }
+                    } catch {
+                        print("Failed to delete from camera roll: \(error)")
+                    }
                 }
             }
 
             await MainActor.run {
-                isRestoring = false
+                isAddingPhotos = false
 
                 if successCount > 0 {
                     Haptics.success()
-                    appState.logActivity(.restored, count: successCount)
-                    restoreSuccessCount = successCount
-                    showingRestoreSuccess = true
-                    selectedPhotoIds.removeAll()
-                    isSelectionMode = false
+                    appState.logActivity(.secured, count: successCount)
+                    addedPhotosCount = successCount
+                    showingAddSuccess = true
+                    loadPhotos()
                 } else {
                     Haptics.error()
-                    errorMessage = "Could not restore photos. Please check your photo library permissions."
+                    errorMessage = "Could not add photos to vault."
                     showingError = true
                 }
             }
@@ -527,22 +590,6 @@ struct VaultThumbnailView: View {
     }
 }
 
-// MARK: - ShareSheet
-
-struct ShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        let controller = UIActivityViewController(
-            activityItems: items,
-            applicationActivities: nil
-        )
-        return controller
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
-
 // MARK: - SecurePhotoView
 
 struct SecurePhotoView: View {
@@ -556,7 +603,6 @@ struct SecurePhotoView: View {
     @State private var isLoading = true
     @State private var showingDeleteConfirmation = false
     @State private var showingRestoreConfirmation = false
-    @State private var showingShareSheet = false
     @State private var showingRestoreSuccess = false
     @State private var showingRestoreError = false
     @State private var isRestoring = false
@@ -605,7 +651,7 @@ struct SecurePhotoView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
-                            showingShareSheet = true
+                            sharePhoto()
                         } label: {
                             Label("Share", systemImage: "square.and.arrow.up")
                         }
@@ -642,11 +688,6 @@ struct SecurePhotoView: View {
         }
         .onAppear {
             loadFullImage()
-        }
-        .sheet(isPresented: $showingShareSheet) {
-            if let image = image {
-                ShareSheet(items: [image])
-            }
         }
         .alert("Delete Photo", isPresented: $showingDeleteConfirmation) {
             Button("Cancel", role: .cancel) {}
@@ -687,6 +728,21 @@ struct SecurePhotoView: View {
                 }
                 .ignoresSafeArea()
             }
+        }
+    }
+
+    private func sharePhoto() {
+        guard let image = image,
+              let data = image.jpegData(compressionQuality: 0.9) else { return }
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("vault_photo_share.jpg")
+        do {
+            try data.write(to: fileURL)
+            presentShareSheet(items: [fileURL]) {
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+        } catch {
+            print("Failed to write temp file for sharing: \(error)")
         }
     }
 
@@ -733,6 +789,29 @@ struct SecurePhotoView: View {
             }
         }
     }
+}
+
+// MARK: - Share Helper
+
+/// Presents UIActivityViewController via UIKit for full share sheet (AirDrop, Messages, Mail, etc.)
+func presentShareSheet(items: [Any], completion: (() -> Void)? = nil) {
+    let activityVC = UIActivityViewController(
+        activityItems: items,
+        applicationActivities: nil
+    )
+    activityVC.completionWithItemsHandler = { _, _, _, _ in
+        completion?()
+    }
+
+    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+          let rootVC = windowScene.windows.first?.rootViewController else { return }
+
+    var topVC = rootVC
+    while let presented = topVC.presentedViewController {
+        topVC = presented
+    }
+    activityVC.popoverPresentationController?.sourceView = topVC.view
+    topVC.present(activityVC, animated: true)
 }
 
 #Preview {

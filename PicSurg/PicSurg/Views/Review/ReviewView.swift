@@ -130,14 +130,14 @@ struct ReviewView: View {
                 secureSelectedPhotos()
             }
         } message: {
-            Text("This will encrypt \(selectedCount) photos and remove them from your camera roll. This cannot be undone.")
+            Text("This will encrypt \(selectedCount) photo\(selectedCount == 1 ? "" : "s"), remove them from your camera roll, and store them in your vault. For full privacy, empty your Recently Deleted folder afterwards.")
         }
         .alert("Success", isPresented: $showingSuccess) {
             Button("Done") {
                 onComplete()
             }
         } message: {
-            Text("\(securedCountForMessage) photos have been secured in your vault.")
+            Text("\(securedCountForMessage) photo\(securedCountForMessage == 1 ? "" : "s") secured in your vault.")
         }
         .alert("Partial Success", isPresented: $showingError) {
             Button("OK") {

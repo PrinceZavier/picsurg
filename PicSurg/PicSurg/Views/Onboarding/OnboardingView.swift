@@ -14,7 +14,7 @@ struct OnboardingView: View {
     @State private var recoveryEmail = ""
     @State private var enableBiometric = true
 
-    private let totalSteps = 5
+    private let totalSteps = 6
 
     var body: some View {
         VStack {
@@ -66,9 +66,16 @@ struct OnboardingView: View {
                     biometricName: authService.biometricName,
                     isAvailable: authService.isBiometricAvailable,
                     onBack: { currentStep = 3 },
-                    onComplete: { completeOnboarding() }
+                    onComplete: { saveBiometric() }
                 )
                 .tag(4)
+
+                // Step 6: Scan Reminders
+                ReminderSetupStep(
+                    onBack: { currentStep = 4 },
+                    onComplete: { completeOnboarding() }
+                )
+                .tag(5)
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
             .animation(.easeInOut, value: currentStep)
@@ -103,8 +110,12 @@ struct OnboardingView: View {
         currentStep = 4
     }
 
-    private func completeOnboarding() {
+    private func saveBiometric() {
         authService.isBiometricEnabled = enableBiometric && authService.isBiometricAvailable
+        currentStep = 5
+    }
+
+    private func completeOnboarding() {
         appState.setOnboardingComplete()
         authService.unlock()
     }
@@ -554,6 +565,114 @@ struct BiometricStep: View {
             Spacer()
 
             Button(action: onComplete) {
+                Text("Continue")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Theme.Colors.primary)
+                    .cornerRadius(12)
+            }
+            .padding(.horizontal)
+        }
+        .padding()
+    }
+}
+
+struct ReminderSetupStep: View {
+    let onBack: () -> Void
+    let onComplete: () -> Void
+
+    @StateObject private var reminderService = ReminderService.shared
+    @State private var enableReminders = false
+    @State private var frequency: ReminderFrequency = .daily
+    @State private var reminderTime: Date = {
+        var components = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        components.hour = 18
+        components.minute = 0
+        return Calendar.current.date(from: components) ?? Date()
+    }()
+    @State private var weekday = 6 // Friday
+
+    var body: some View {
+        VStack(spacing: 24) {
+            // Back button
+            HStack {
+                Button(action: onBack) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                        Text("Back")
+                    }
+                    .foregroundColor(Theme.Colors.primary)
+                }
+                Spacer()
+            }
+            .padding(.horizontal)
+
+            Spacer()
+
+            Image(systemName: "bell.badge")
+                .font(.system(size: 80))
+                .foregroundColor(Theme.Colors.primary)
+
+            Text("Scan Reminders")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            Text("Get reminded to scan for surgical photos at the end of your shift.")
+                .multilineTextAlignment(.center)
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 40)
+
+            // Reminder options
+            VStack(spacing: 16) {
+                Toggle("Enable Reminders", isOn: $enableReminders)
+                    .tint(Theme.Colors.primary)
+
+                if enableReminders {
+                    Picker("Frequency", selection: $frequency) {
+                        ForEach(ReminderFrequency.allCases, id: \.self) { freq in
+                            Text(freq.displayName).tag(freq)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    DatePicker("Time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+
+                    if frequency == .weekly {
+                        Picker("Day", selection: $weekday) {
+                            Text("Sunday").tag(1)
+                            Text("Monday").tag(2)
+                            Text("Tuesday").tag(3)
+                            Text("Wednesday").tag(4)
+                            Text("Thursday").tag(5)
+                            Text("Friday").tag(6)
+                            Text("Saturday").tag(7)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 40)
+            .padding(.top)
+
+            Spacer()
+
+            Button(action: {
+                if enableReminders {
+                    Task {
+                        let granted = await reminderService.requestPermission()
+                        if granted {
+                            reminderService.frequency = frequency
+                            reminderService.reminderTime = reminderTime
+                            reminderService.weekday = weekday
+                            reminderService.isEnabled = true
+                        }
+                        onComplete()
+                    }
+                } else {
+                    onComplete()
+                }
+            }) {
                 Text("Complete Setup")
                     .font(.headline)
                     .foregroundColor(.white)

@@ -1,8 +1,8 @@
 # PicSurg - Product Requirements Document (PRD)
 
-**Version:** 1.1
-**Last Updated:** February 7, 2026
-**Status:** MVP Complete
+**Version:** 1.2
+**Last Updated:** March 2, 2026
+**Status:** MVP Complete + Phase 6 Enhancements
 
 ---
 
@@ -85,8 +85,10 @@ An intelligent iOS app that:
 | **Description** | Secure access to the app and vault |
 | **Methods** | Face ID, Touch ID, 6-digit PIN |
 | **Fallback** | PIN required as backup for biometric |
-| **Lock Timing** | Immediate lock when app backgrounds |
-| **Failed Attempts** | Lock for increasing duration after failures |
+| **PIN Security** | PBKDF2-HMAC-SHA256 (100K iterations), random salt, constant-time comparison |
+| **Lock Timing** | Configurable grace period (immediate to 5 min) and inactivity timeout (1-15 min) |
+| **Failed Attempts** | Progressive lockout (1 min → 5 min → 15 min → 1 hour) |
+| **Auto-Wipe** | Optional data erasure after 10-25 failed attempts (configurable) |
 | **PIN Recovery** | Recovery email with 6-digit code (15-min expiry) |
 | **Priority** | P0 - Critical |
 
@@ -99,9 +101,26 @@ An intelligent iOS app that:
 | **Recovery** | Photos remain in "Recently Deleted" per iOS behavior |
 | **Priority** | P0 - Critical |
 
+#### F6: Manual Photo Addition ✅ IMPLEMENTED
+| Attribute | Requirement |
+|-----------|-------------|
+| **Description** | Allow users to manually add photos to vault via photo picker |
+| **Use Case** | Photos ML missed or non-surgical sensitive images |
+| **Max Selection** | 50 photos per batch |
+| **Behavior** | Encrypts selected photos and removes originals from camera roll |
+| **Priority** | P1 - Implemented |
+
+#### F7: Scan Reminders ✅ IMPLEMENTED
+| Attribute | Requirement |
+|-----------|-------------|
+| **Description** | Configurable notification reminders to scan for surgical photos |
+| **Frequency** | Daily or weekly |
+| **Customization** | Time of day and weekday (for weekly) |
+| **Priority** | P1 - Implemented |
+
 ### 3.2 Future Features (Post-MVP)
 
-#### F6: Background Automatic Scanning
+#### F8: Background Automatic Scanning
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Scan for new photos automatically in background |
@@ -109,14 +128,7 @@ An intelligent iOS app that:
 | **Frequency** | Configurable (hourly, daily, weekly) |
 | **Priority** | P1 - High (complex, defer if needed for MVP) |
 
-#### F7: Manual Photo Addition
-| Attribute | Requirement |
-|-----------|-------------|
-| **Description** | Allow users to manually add photos to vault |
-| **Use Case** | Photos ML missed or non-surgical sensitive images |
-| **Priority** | P1 - High |
-
-#### F8: Export/Share Functionality ✅ IMPLEMENTED
+#### F9: Export/Share Functionality ✅ IMPLEMENTED
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Securely export photos from vault |
@@ -125,14 +137,14 @@ An intelligent iOS app that:
 | **Single Share** | Share individual photos from detail view |
 | **Priority** | P0 - Implemented in MVP |
 
-#### F9: Search & Organization
+#### F10: Search & Organization
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Search and organize vault photos |
 | **Features** | Tags, folders, date filtering, text search |
 | **Priority** | P2 - Medium |
 
-#### F10: Cloud Backup
+#### F11: Cloud Backup
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Encrypted backup to iCloud or secure server |
@@ -159,16 +171,19 @@ An intelligent iOS app that:
 
 | ID | As a... | I want to... | So that... | Status |
 |----|---------|--------------|------------|--------|
+| US7 | Healthcare provider | Manually add photos to vault | I can secure images ML missed | ✅ Implemented |
+| US8 | Healthcare provider | Get scan reminders | I don't forget to scan after shifts | ✅ Implemented |
 | US9 | Healthcare provider | Export photos securely | I can share for consultations | ✅ Implemented |
+| US10 | Healthcare provider | Have my data auto-wiped on too many failed attempts | My data is safe if phone is stolen | ✅ Implemented |
+| US11 | Healthcare provider | Configure session lock timing | I control the security/convenience tradeoff | ✅ Implemented |
 
 ### Post-MVP User Stories
 
 | ID | As a... | I want to... | So that... |
 |----|---------|--------------|------------|
-| US7 | Healthcare provider | Have photos scanned automatically | I don't have to remember to scan |
-| US8 | Healthcare provider | Manually add photos to vault | I can secure images ML missed |
-| US10 | Healthcare provider | Organize photos by case/patient | I can find images when needed |
-| US11 | Healthcare provider | Back up vault to cloud | I don't lose photos if phone lost |
+| US12 | Healthcare provider | Have photos scanned automatically | I don't have to remember to scan |
+| US13 | Healthcare provider | Organize photos by case/patient | I can find images when needed |
+| US14 | Healthcare provider | Back up vault to cloud | I don't lose photos if phone lost |
 
 ---
 
@@ -184,11 +199,12 @@ An intelligent iOS app that:
 - Enable Face ID/Touch ID (optional but recommended)
 
 #### Screen 2: Home/Dashboard
-- Clean, minimal design with app logo
-- "Scan Photos" / "Scan New Photos" button
+- Shazam-style interactive scan button with spinning logo and pulsing glow rings
+- "Tap to PicSurg" prompt, "Scanning..." state with progress
 - Last scan date/time (subtle display)
-- Three-line menu with: Open Photos, Settings, Photo Access Settings
+- Three-line hamburger menu: Add Photos Manually, Open Photos, Scan Photos, Settings, Photo Access Settings
 - Batch scanning (100 photos at a time, tracks scanned photos)
+- Manual photo addition via PhotosPicker (up to 50 at a time)
 
 #### Screen 3: Scan Results / Review
 - Grid of identified surgical photos
@@ -209,10 +225,13 @@ An intelligent iOS app that:
 - **Restore to Camera Roll**: Return photos to photo library
 
 #### Screen 5: Settings
-- Authentication settings (PIN change, biometric toggle, recovery email)
-- Scan settings (reset scan history)
-- About/Help
-- Delete all data option
+- **Security** — Biometric toggle, change PIN, auto-wipe toggle with threshold picker (10-25 attempts)
+- **Session & Lock** — Grace period on background (immediate to 5 min), inactivity auto-lock (1-15 min or never)
+- **Photo Access** — View current access level, link to system settings
+- **Reminders** — Toggle scan reminders, frequency (daily/weekly), time, weekday
+- **Storage** — Photo count, storage used, clear vault
+- **About** — Version, privacy policy, help & support
+- **Danger Zone** — Reset app (deletes all data)
 
 #### Screen 6: Lock Screen
 - App logo with teal glow effect (matching branding)

@@ -1,8 +1,8 @@
 # PicSurg - Technical Architecture Document
 
-**Version:** 1.1
-**Last Updated:** February 7, 2026
-**Status:** MVP Complete
+**Version:** 1.2
+**Last Updated:** March 2, 2026
+**Status:** MVP Complete + Phase 6 Enhancements
 
 ---
 
@@ -68,8 +68,9 @@ This document describes the technical architecture for PicSurg, an iOS applicati
 | **Photo Service** | Accesses iOS Photo Library to fetch and delete photos |
 | **ML Service** | Runs the trained model to classify photos as surgical or not |
 | **Vault Service** | Manages the secure storage area (add, list, retrieve, delete photos) |
-| **Auth Service** | Handles Face ID, Touch ID, and PIN authentication |
+| **Auth Service** | Handles Face ID, Touch ID, PIN (PBKDF2), auto-wipe, session management |
 | **Crypto Service** | Encrypts photos before storage, decrypts when viewing (AES-256) |
+| **Reminder Service** | Manages scan reminder notifications (daily/weekly) |
 | **Storage Service** | Low-level file system operations for the encrypted vault |
 
 ---
@@ -766,6 +767,8 @@ class HomeViewModel: ObservableObject {
 | Core ML | ML Model Runtime | Apple Framework |
 | CryptoKit | Encryption | Apple Framework |
 | LocalAuthentication | Biometric Auth | Apple Framework |
+| UserNotifications | Scan Reminders | Apple Framework |
+| CommonCrypto | PBKDF2 Key Derivation | Apple Framework |
 | BackgroundTasks | Background Processing | Apple Framework |
 
 **Note:** All dependencies are first-party Apple frameworks. No third-party dependencies required for MVP.

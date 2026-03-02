@@ -157,7 +157,7 @@ final class AppState: ObservableObject {
     enum Tab {
         case home
         case vault
-        case settings
+        case camera // Placeholder for future in-app camera
     }
 
     // MARK: - Error Handling
@@ -294,6 +294,8 @@ final class AppState: ObservableObject {
         UserDefaults.standard.removeObject(forKey: Self.onboardingCompleteKey)
         UserDefaults.standard.removeObject(forKey: Self.lastScanDateKey)
         UserDefaults.standard.removeObject(forKey: Self.recentActivityKey)
+
+        ReminderService.shared.resetAll()
     }
 
     /// Get the last scan activity for display

@@ -17,9 +17,18 @@ struct PicSurgApp: App {
             RootView()
                 .environmentObject(appState)
                 .environmentObject(authService)
+                .detectInactivity(authService: authService)
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                    // Lock app when going to background
-                    authService.lock()
+                    if authService.isAuthenticated {
+                        authService.recordBackgroundTimestamp()
+                        authService.stopInactivityTimer()
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    authService.checkGracePeriodOnForeground()
+                    if authService.isAuthenticated {
+                        authService.resetInactivityTimer()
+                    }
                 }
         }
     }

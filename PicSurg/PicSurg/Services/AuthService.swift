@@ -14,6 +14,8 @@ final class AuthService: ObservableObject {
     @Published var isLocked = true
     @Published var failedAttempts = 0
     @Published var lockoutEndTime: Date?
+    @Published var showWipeWarning = false
+    @Published var wipeWarningLevel: WipeWarningLevel = .none
 
     // MARK: - Biometric Type
 
@@ -21,6 +23,57 @@ final class AuthService: ObservableObject {
         case faceID
         case touchID
         case none
+    }
+
+    // MARK: - Auto-Wipe Warning Levels
+
+    enum WipeWarningLevel: Equatable {
+        case none
+        case caution(attemptsRemaining: Int)
+        case danger(attemptsRemaining: Int)
+        case critical(attemptsRemaining: Int)
+    }
+
+    // MARK: - Session Enums
+
+    enum GracePeriod: Int, CaseIterable, Identifiable {
+        case immediate = 0
+        case thirtySeconds = 30
+        case oneMinute = 60
+        case twoMinutes = 120
+        case fiveMinutes = 300
+
+        var id: Int { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .immediate: return "Immediately"
+            case .thirtySeconds: return "30 seconds"
+            case .oneMinute: return "1 minute"
+            case .twoMinutes: return "2 minutes"
+            case .fiveMinutes: return "5 minutes"
+            }
+        }
+    }
+
+    enum InactivityTimeout: Int, CaseIterable, Identifiable {
+        case oneMinute = 60
+        case twoMinutes = 120
+        case fiveMinutes = 300
+        case fifteenMinutes = 900
+        case never = 0
+
+        var id: Int { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .oneMinute: return "1 minute"
+            case .twoMinutes: return "2 minutes"
+            case .fiveMinutes: return "5 minutes"
+            case .fifteenMinutes: return "15 minutes"
+            case .never: return "Never"
+            }
+        }
     }
 
     // MARK: - Keys
@@ -33,6 +86,11 @@ final class AuthService: ObservableObject {
     private static let recoveryEmailKey = "com.picsurg.auth.recoveryEmail"
     private static let recoveryCodeKey = "com.picsurg.auth.recoveryCode"
     private static let recoveryCodeExpiryKey = "com.picsurg.auth.recoveryCodeExpiry"
+    private static let autoWipeEnabledKey = "com.picsurg.auth.autoWipeEnabled"
+    private static let autoWipeThresholdKey = "com.picsurg.auth.autoWipeThreshold"
+    private static let gracePeriodKey = "com.picsurg.auth.gracePeriod"
+    private static let inactivityTimeoutKey = "com.picsurg.auth.inactivityTimeout"
+    private static let backgroundTimestampKey = "com.picsurg.auth.backgroundTimestamp"
 
     // MARK: - Singleton
 
@@ -81,7 +139,66 @@ final class AuthService: ObservableObject {
 
     var isBiometricEnabled: Bool {
         get { UserDefaults.standard.bool(forKey: Self.biometricEnabledKey) }
-        set { UserDefaults.standard.set(newValue, forKey: Self.biometricEnabledKey) }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Self.biometricEnabledKey)
+        }
+    }
+
+    // MARK: - Auto-Wipe Settings
+
+    var isAutoWipeEnabled: Bool {
+        get { UserDefaults.standard.bool(forKey: Self.autoWipeEnabledKey) }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Self.autoWipeEnabledKey)
+            if !newValue {
+                wipeWarningLevel = .none
+                showWipeWarning = false
+            }
+        }
+    }
+
+    var autoWipeThreshold: Int {
+        get {
+            let stored = UserDefaults.standard.integer(forKey: Self.autoWipeThresholdKey)
+            return stored > 0 ? stored : 20
+        }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue, forKey: Self.autoWipeThresholdKey)
+        }
+    }
+
+    // MARK: - Session Settings
+
+    var gracePeriod: GracePeriod {
+        get {
+            let stored = UserDefaults.standard.integer(forKey: Self.gracePeriodKey)
+            // Check if key was ever set (0 could mean .immediate or never-set)
+            if UserDefaults.standard.object(forKey: Self.gracePeriodKey) != nil {
+                return GracePeriod(rawValue: stored) ?? .thirtySeconds
+            }
+            return .thirtySeconds
+        }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue.rawValue, forKey: Self.gracePeriodKey)
+        }
+    }
+
+    var inactivityTimeout: InactivityTimeout {
+        get {
+            if UserDefaults.standard.object(forKey: Self.inactivityTimeoutKey) != nil {
+                let stored = UserDefaults.standard.integer(forKey: Self.inactivityTimeoutKey)
+                return InactivityTimeout(rawValue: stored) ?? .fiveMinutes
+            }
+            return .fiveMinutes
+        }
+        set {
+            objectWillChange.send()
+            UserDefaults.standard.set(newValue.rawValue, forKey: Self.inactivityTimeoutKey)
+        }
     }
 
     // MARK: - PBKDF2 Configuration
@@ -146,6 +263,7 @@ final class AuthService: ObservableObject {
             failedAttempts += 1
             saveFailedAttempts()
             checkAndApplyLockout()
+            checkAutoWipeStatus()
         }
 
         return isValid
@@ -332,6 +450,7 @@ final class AuthService: ObservableObject {
     func lock() {
         isAuthenticated = false
         isLocked = true
+        stopInactivityTimer()
     }
 
     func unlock() {
@@ -339,7 +458,10 @@ final class AuthService: ObservableObject {
         isLocked = false
         failedAttempts = 0
         lockoutEndTime = nil
+        wipeWarningLevel = .none
+        showWipeWarning = false
         saveFailedAttempts()
+        resetInactivityTimer()
     }
 
     // MARK: - Lockout Management
@@ -352,6 +474,14 @@ final class AuthService: ObservableObject {
     var lockoutRemainingSeconds: Int {
         guard let endTime = lockoutEndTime else { return 0 }
         return max(0, Int(endTime.timeIntervalSinceNow))
+    }
+
+    /// Called by the UI when the lockout countdown reaches zero
+    func clearExpiredLockout() {
+        lockoutEndTime = nil
+        failedAttempts = 0
+        saveFailedAttempts()
+        UserDefaults.standard.removeObject(forKey: Self.lockoutEndKey)
     }
 
     private func checkAndApplyLockout() {
@@ -382,7 +512,10 @@ final class AuthService: ObservableObject {
             if Date() < endTime {
                 lockoutEndTime = endTime
             } else {
+                // Lockout expired — reset failed attempts so user gets a fresh start
                 lockoutEndTime = nil
+                failedAttempts = 0
+                saveFailedAttempts()
                 UserDefaults.standard.removeObject(forKey: Self.lockoutEndKey)
             }
         }
@@ -400,5 +533,112 @@ final class AuthService: ObservableObject {
         if let endTime = lockoutEndTime {
             UserDefaults.standard.set(endTime.timeIntervalSince1970, forKey: Self.lockoutEndKey)
         }
+    }
+
+    // MARK: - Auto-Wipe
+
+    private func checkAutoWipeStatus() {
+        guard isAutoWipeEnabled else {
+            wipeWarningLevel = .none
+            showWipeWarning = false
+            return
+        }
+
+        let remaining = autoWipeThreshold - failedAttempts
+
+        switch remaining {
+        case ...0:
+            performAutoWipe()
+        case 1:
+            wipeWarningLevel = .critical(attemptsRemaining: remaining)
+            showWipeWarning = true
+        case 2...3:
+            wipeWarningLevel = .danger(attemptsRemaining: remaining)
+            showWipeWarning = true
+        case 4...5:
+            wipeWarningLevel = .caution(attemptsRemaining: remaining)
+            showWipeWarning = true
+        default:
+            wipeWarningLevel = .none
+            showWipeWarning = false
+        }
+    }
+
+    func performAutoWipe() {
+        // Clear vault data
+        try? VaultService.shared.clearVault()
+
+        // Delete encryption key
+        try? CryptoService.deleteKey()
+
+        // Reset reminders
+        ReminderService.shared.resetAll()
+
+        // Reset app state
+        AppState.shared.resetAllData()
+
+        // Reset auth state
+        failedAttempts = 0
+        lockoutEndTime = nil
+        saveFailedAttempts()
+        UserDefaults.standard.removeObject(forKey: Self.lockoutEndKey)
+
+        // Delete PIN
+        try? deletePIN()
+
+        // Reset auto-wipe setting
+        isAutoWipeEnabled = false
+
+        // Clear warnings
+        wipeWarningLevel = .none
+        showWipeWarning = false
+    }
+
+    // MARK: - Grace Period
+
+    func recordBackgroundTimestamp() {
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Self.backgroundTimestampKey)
+    }
+
+    func checkGracePeriodOnForeground() {
+        guard isAuthenticated else { return }
+
+        guard let backgroundTimestamp = UserDefaults.standard.object(forKey: Self.backgroundTimestampKey) as? TimeInterval else {
+            return
+        }
+
+        let backgroundDate = Date(timeIntervalSince1970: backgroundTimestamp)
+        let elapsed = Date().timeIntervalSince(backgroundDate)
+        let allowedGrace = TimeInterval(gracePeriod.rawValue)
+
+        if elapsed > allowedGrace {
+            lock()
+        }
+
+        UserDefaults.standard.removeObject(forKey: Self.backgroundTimestampKey)
+    }
+
+    // MARK: - Inactivity Timer
+
+    private var inactivityTimer: Timer?
+
+    func resetInactivityTimer() {
+        inactivityTimer?.invalidate()
+
+        guard isAuthenticated else { return }
+        guard inactivityTimeout != .never else { return }
+
+        let timeout = TimeInterval(inactivityTimeout.rawValue)
+
+        inactivityTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                self?.lock()
+            }
+        }
+    }
+
+    func stopInactivityTimer() {
+        inactivityTimer?.invalidate()
+        inactivityTimer = nil
     }
 }

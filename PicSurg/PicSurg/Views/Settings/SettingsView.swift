@@ -12,6 +12,10 @@ struct SettingsView: View {
     @State private var showingResetApp = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var showingNotificationPermission = false
+    @State private var showingAutoWipeConfirm = false
+    @State private var showingAutoWipeInfo = false
+    @StateObject private var reminderService = ReminderService.shared
 
     // MARK: - Photo Access Helpers
 
@@ -40,7 +44,9 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 securitySection
+                sessionLockSection
                 photoAccessSection
+                remindersSection
                 storageSection
                 aboutSection
                 dangerZoneSection
@@ -65,10 +71,31 @@ struct SettingsView: View {
             } message: {
                 Text("This will delete all your data including secured photos, PIN, and settings. This cannot be undone.")
             }
+            .alert("Notifications Disabled", isPresented: $showingNotificationPermission) {
+                Button("Open Settings") {
+                    openAppSettings()
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Please enable notifications in Settings to use scan reminders.")
+            }
             .alert("Error", isPresented: $showingError) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
+            }
+            .alert("Enable Data Erasure?", isPresented: $showingAutoWipeConfirm) {
+                Button("Cancel", role: .cancel) {}
+                Button("Enable", role: .destructive) {
+                    authService.isAutoWipeEnabled = true
+                }
+            } message: {
+                Text("When enabled, all vault photos, encryption keys, and app data will be permanently erased after too many failed PIN attempts.\n\nMake sure you have a recovery email set up in case you forget your PIN.")
+            }
+            .alert("About Data Erasure", isPresented: $showingAutoWipeInfo) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("This feature protects your data if your phone is lost or stolen. After the set number of failed PIN attempts, all vault data is permanently erased.\n\nWarnings appear at 5, 3, and 1 remaining attempts. We recommend setting up a recovery email before enabling this feature.")
             }
         }
     }
@@ -76,7 +103,7 @@ struct SettingsView: View {
     // MARK: - Sections
 
     private var securitySection: some View {
-        Section("Security") {
+        Section {
             if authService.isBiometricAvailable {
                 Toggle(isOn: Binding(
                     get: { authService.isBiometricEnabled },
@@ -91,6 +118,81 @@ struct SettingsView: View {
             } label: {
                 Label("Change PIN", systemImage: "lock.rotation")
             }
+
+            // Auto-wipe toggle
+            HStack {
+                Toggle(isOn: Binding(
+                    get: { authService.isAutoWipeEnabled },
+                    set: { newValue in
+                        if newValue {
+                            showingAutoWipeConfirm = true
+                        } else {
+                            authService.isAutoWipeEnabled = false
+                        }
+                    }
+                )) {
+                    Label("Erase Data on Failed Attempts", systemImage: "exclamationmark.shield")
+                }
+
+                Button {
+                    showingAutoWipeInfo = true
+                } label: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            // Threshold picker (only when auto-wipe is enabled)
+            if authService.isAutoWipeEnabled {
+                Picker(selection: Binding(
+                    get: { authService.autoWipeThreshold },
+                    set: { authService.autoWipeThreshold = $0 }
+                )) {
+                    Text("10 attempts").tag(10)
+                    Text("15 attempts").tag(15)
+                    Text("20 attempts").tag(20)
+                    Text("25 attempts").tag(25)
+                } label: {
+                    Label("Erase after", systemImage: "number")
+                }
+            }
+        } header: {
+            Text("Security")
+        } footer: {
+            if authService.isAutoWipeEnabled {
+                Text("All vault data will be permanently erased after \(authService.autoWipeThreshold) failed PIN attempts. Warnings appear at 5, 3, and 1 remaining attempts.")
+            }
+        }
+    }
+
+    private var sessionLockSection: some View {
+        Section {
+            Picker(selection: Binding(
+                get: { authService.gracePeriod },
+                set: { authService.gracePeriod = $0 }
+            )) {
+                ForEach(AuthService.GracePeriod.allCases) { period in
+                    Text(period.displayName).tag(period)
+                }
+            } label: {
+                Label("Lock on Background", systemImage: "rectangle.portrait.and.arrow.right")
+            }
+
+            Picker(selection: Binding(
+                get: { authService.inactivityTimeout },
+                set: { authService.inactivityTimeout = $0 }
+            )) {
+                ForEach(AuthService.InactivityTimeout.allCases) { timeout in
+                    Text(timeout.displayName).tag(timeout)
+                }
+            } label: {
+                Label("Auto-Lock (Inactivity)", systemImage: "timer")
+            }
+        } header: {
+            Text("Session & Lock")
+        } footer: {
+            Text("Lock on Background: how long after leaving the app before it locks. Auto-Lock: locks after no interaction for the selected time.")
         }
     }
 
@@ -112,6 +214,84 @@ struct SettingsView: View {
             Text("Photo Access")
         } footer: {
             Text("Opens Settings where you can change photo library access permissions.")
+        }
+    }
+
+    private var remindersSection: some View {
+        Section {
+            Toggle(isOn: Binding(
+                get: { reminderService.isEnabled },
+                set: { newValue in
+                    if newValue {
+                        Task {
+                            let status = reminderService.notificationPermission
+                            if status == .notDetermined {
+                                let granted = await reminderService.requestPermission()
+                                if granted {
+                                    reminderService.isEnabled = true
+                                }
+                            } else if status == .authorized || status == .provisional {
+                                reminderService.isEnabled = true
+                            } else {
+                                showingNotificationPermission = true
+                            }
+                        }
+                    } else {
+                        reminderService.isEnabled = false
+                    }
+                }
+            )) {
+                Label("Scan Reminders", systemImage: "bell")
+            }
+
+            if reminderService.isEnabled {
+                Picker(selection: Binding(
+                    get: { reminderService.frequency },
+                    set: { reminderService.frequency = $0 }
+                )) {
+                    ForEach(ReminderFrequency.allCases, id: \.self) { freq in
+                        Text(freq.displayName).tag(freq)
+                    }
+                } label: {
+                    Label("Frequency", systemImage: "repeat")
+                }
+
+                DatePicker(
+                    selection: Binding(
+                        get: { reminderService.reminderTime },
+                        set: { reminderService.reminderTime = $0 }
+                    ),
+                    displayedComponents: .hourAndMinute
+                ) {
+                    Label("Time", systemImage: "clock")
+                }
+
+                if reminderService.frequency == .weekly {
+                    Picker(selection: Binding(
+                        get: { reminderService.weekday },
+                        set: { reminderService.weekday = $0 }
+                    )) {
+                        Text("Sunday").tag(1)
+                        Text("Monday").tag(2)
+                        Text("Tuesday").tag(3)
+                        Text("Wednesday").tag(4)
+                        Text("Thursday").tag(5)
+                        Text("Friday").tag(6)
+                        Text("Saturday").tag(7)
+                    } label: {
+                        Label("Day", systemImage: "calendar")
+                    }
+                }
+            }
+        } header: {
+            Text("Reminders")
+        } footer: {
+            Text(reminderService.isEnabled
+                ? "You'll be reminded to scan for surgical photos \(reminderService.frequency == .daily ? "every day" : "every week")."
+                : "Get notified to check for surgical photos at the end of your shift.")
+        }
+        .onAppear {
+            reminderService.checkPermission()
         }
     }
 
@@ -208,6 +388,7 @@ struct SettingsView: View {
         }
 
         appState.resetAllData()
+        ReminderService.shared.resetAll()
 
         if !errors.isEmpty {
             Haptics.warning()

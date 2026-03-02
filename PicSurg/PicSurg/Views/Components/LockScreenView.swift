@@ -9,8 +9,11 @@ struct LockScreenView: View {
     @State private var errorMessage = ""
     @State private var isAuthenticating = false
     @State private var showingRecovery = false
+    @State private var lockoutCountdown = 0
+    @State private var lockoutTimer: Timer?
 
     private let pinLength = 6
+    private let lockoutThreshold = 5
 
     var body: some View {
         ZStack {
@@ -67,9 +70,15 @@ struct LockScreenView: View {
                         .font(.callout)
                 }
 
-                // Lockout message
-                if authService.isLockedOut {
-                    Text("Too many attempts. Try again in \(formatTime(authService.lockoutRemainingSeconds))")
+                // Auto-wipe warning banner
+                if authService.showWipeWarning {
+                    wipeWarningBanner
+                        .transition(.opacity.combined(with: .scale))
+                }
+
+                // Lockout message with live countdown
+                if lockoutCountdown > 0 {
+                    Text("Too many attempts. Try again in \(formatTime(lockoutCountdown))")
                         .foregroundColor(.orange)
                         .font(.callout)
                 }
@@ -119,7 +128,7 @@ struct LockScreenView: View {
                         .foregroundColor(.primary)
                     }
                 }
-                .disabled(authService.isLockedOut)
+                .disabled(authService.isLockedOut || lockoutCountdown > 0)
 
                 // Forgot PIN button
                 if authService.hasRecoveryEmail {
@@ -137,10 +146,18 @@ struct LockScreenView: View {
             }
             .padding()
             .onAppear {
+                // Start lockout countdown if already locked out
+                if authService.isLockedOut {
+                    startLockoutCountdown()
+                }
                 // Try biometric on appear
                 if authService.isBiometricAvailable && authService.isBiometricEnabled && !authService.isLockedOut {
                     authenticateWithBiometric()
                 }
+            }
+            .onDisappear {
+                lockoutTimer?.invalidate()
+                lockoutTimer = nil
             }
 
             // Recovery overlay
@@ -151,6 +168,68 @@ struct LockScreenView: View {
             }
         }
         .animation(.easeInOut, value: showingRecovery)
+    }
+
+    private var wipeWarningBanner: some View {
+        Group {
+            switch authService.wipeWarningLevel {
+            case .caution(let remaining):
+                VStack(spacing: 4) {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text("Security Warning")
+                            .fontWeight(.semibold)
+                    }
+                    Text("\(remaining) attempt\(remaining == 1 ? "" : "s") remaining before all data is erased.")
+                        .font(.caption)
+                }
+                .foregroundColor(.orange)
+                .padding(12)
+                .background(Color.orange.opacity(0.15))
+                .cornerRadius(10)
+                .padding(.horizontal)
+
+            case .danger(let remaining):
+                VStack(spacing: 4) {
+                    HStack {
+                        Image(systemName: "exclamationmark.octagon.fill")
+                        Text("DATA LOSS WARNING")
+                            .fontWeight(.bold)
+                    }
+                    Text("\(remaining) incorrect attempt\(remaining == 1 ? "" : "s") remain. All vault photos and data will be permanently deleted.")
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                }
+                .foregroundColor(.red)
+                .padding(12)
+                .background(Color.red.opacity(0.15))
+                .cornerRadius(10)
+                .padding(.horizontal)
+
+            case .critical(let remaining):
+                VStack(spacing: 6) {
+                    HStack {
+                        Image(systemName: "trash.circle.fill")
+                            .font(.title2)
+                        Text("FINAL WARNING")
+                            .font(.headline)
+                            .fontWeight(.heavy)
+                    }
+                    Text("This is your LAST attempt. One more incorrect PIN will permanently erase all photos, encryption keys, and app data. This cannot be undone.")
+                        .font(.caption)
+                        .multilineTextAlignment(.center)
+                        .fontWeight(.medium)
+                }
+                .foregroundColor(.white)
+                .padding(16)
+                .background(Color.red)
+                .cornerRadius(12)
+                .padding(.horizontal)
+
+            case .none:
+                EmptyView()
+            }
+        }
     }
 
     private func addDigit(_ digit: String) {
@@ -172,13 +251,25 @@ struct LockScreenView: View {
         if authService.verifyPIN(pin) {
             // Success - authService.unlock() is called in verifyPIN
             pin = ""
+            lockoutTimer?.invalidate()
+            lockoutTimer = nil
+            lockoutCountdown = 0
+            showError = false
         } else {
             // Failure
             showError = true
             if authService.isLockedOut {
                 errorMessage = "Account locked"
+                startLockoutCountdown()
+            } else if authService.showWipeWarning {
+                let remaining = authService.autoWipeThreshold - authService.failedAttempts
+                errorMessage = "Incorrect PIN. \(remaining) attempt\(remaining == 1 ? "" : "s") before data is erased."
+            } else if authService.isAutoWipeEnabled {
+                let attemptsUsed = authService.failedAttempts
+                errorMessage = "Incorrect PIN (attempt \(attemptsUsed) of \(lockoutThreshold)). Data erasure enabled."
             } else {
-                errorMessage = "Incorrect PIN. \(5 - authService.failedAttempts) attempts remaining."
+                let attemptsUsed = authService.failedAttempts
+                errorMessage = "Incorrect PIN (attempt \(attemptsUsed) of \(lockoutThreshold))"
             }
             pin = ""
 
@@ -186,6 +277,35 @@ struct LockScreenView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.error)
         }
+    }
+
+    private func startLockoutCountdown() {
+        lockoutTimer?.invalidate()
+        lockoutCountdown = authService.lockoutRemainingSeconds
+
+        guard lockoutCountdown > 0 else {
+            onLockoutExpired()
+            return
+        }
+
+        lockoutTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            Task { @MainActor in
+                lockoutCountdown -= 1
+                if lockoutCountdown <= 0 {
+                    onLockoutExpired()
+                }
+            }
+        }
+    }
+
+    private func onLockoutExpired() {
+        lockoutTimer?.invalidate()
+        lockoutTimer = nil
+        lockoutCountdown = 0
+        showError = false
+        errorMessage = ""
+        // Reset the lockout state in AuthService
+        authService.clearExpiredLockout()
     }
 
     private func authenticateWithBiometric() {
