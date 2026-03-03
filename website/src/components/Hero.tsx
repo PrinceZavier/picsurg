@@ -4,6 +4,33 @@ import Image from "next/image";
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
+      {/* Abstract grid background */}
+      <div className="absolute inset-0 opacity-[0.07]">
+        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-teal" />
+            </pattern>
+            <radialGradient id="grid-fade" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="100%" stopColor="white" stopOpacity="0" />
+            </radialGradient>
+            <mask id="grid-mask">
+              <rect width="100%" height="100%" fill="url(#grid-fade)" />
+            </mask>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" mask="url(#grid-mask)" />
+        </svg>
+      </div>
+
+      {/* Floating abstract shapes */}
+      <div className="absolute top-[15%] left-[10%] h-72 w-72 rounded-full border border-teal/10 opacity-30" />
+      <div className="absolute top-[20%] left-[12%] h-56 w-56 rounded-full border border-cyan/10 opacity-20" />
+      <div className="absolute bottom-[20%] right-[8%] h-96 w-96 rounded-full border border-teal/10 opacity-20" />
+      <div className="absolute bottom-[25%] right-[12%] h-64 w-64 rounded-full border border-cyan/10 opacity-15" />
+      <div className="absolute top-[60%] left-[5%] h-40 w-40 rotate-45 rounded-2xl border border-teal/10 opacity-20" />
+      <div className="absolute top-[10%] right-[15%] h-32 w-32 rotate-12 rounded-2xl border border-cyan/10 opacity-15" />
+
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <div className="h-[500px] w-[500px] rounded-full bg-teal/20 blur-[120px]" />
