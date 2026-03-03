@@ -1,11 +1,38 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Contact & Beta Access — PicSurg",
-  description: "Request beta access to PicSurg or get in touch with our team.",
-};
+import { useState, FormEvent } from "react";
+
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxm-n1gcIHSiM-zDrkd9RTiVtPrIYNJU-bYC2kz5S4pRz1tk40wnUKAmOMSSK-4uyuAMg/exec";
 
 export default function ContactPage() {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setStatus("submitting");
+
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      role: (form.elements.namedItem("role") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
+    };
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      setStatus("success");
+      form.reset();
+    } catch {
+      setStatus("error");
+    }
+  }
+
   return (
     <div className="px-6 pt-32 pb-24">
       <div className="mx-auto max-w-4xl">
@@ -24,68 +51,83 @@ export default function ContactPage() {
           {/* Beta signup form */}
           <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
             <h2 className="mb-6 text-2xl font-bold text-white">Request Beta Access</h2>
-            <form
-              action="https://formspree.io/f/YOUR_FORM_ID"
-              method="POST"
-              className="space-y-5"
-            >
-              <div>
-                <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-300">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
-                  placeholder="Dr. Jane Smith"
-                />
+
+            {status === "success" ? (
+              <div className="rounded-xl border border-teal/30 bg-teal/10 p-6 text-center">
+                <svg className="mx-auto mb-3 h-10 w-10 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <h3 className="mb-2 text-lg font-semibold text-white">You&apos;re on the list!</h3>
+                <p className="text-gray-400">
+                  Thanks for your interest in PicSurg. We&apos;ll be in touch soon.
+                </p>
               </div>
-              <div>
-                <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-300">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
-                  placeholder="jane@hospital.org"
-                />
-              </div>
-              <div>
-                <label htmlFor="role" className="mb-2 block text-sm font-medium text-gray-300">
-                  Role / Specialty
-                </label>
-                <input
-                  type="text"
-                  id="role"
-                  name="role"
-                  className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
-                  placeholder="Orthopedic Surgeon"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-300">
-                  Message (optional)
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={3}
-                  className="w-full resize-none rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
-                  placeholder="Tell us about your use case..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-teal py-3 font-semibold text-white transition-colors hover:bg-teal-light"
-              >
-                Request Access
-              </button>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-300">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    placeholder="Dr. Jane Smith"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-300">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    placeholder="jane@hospital.org"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="role" className="mb-2 block text-sm font-medium text-gray-300">
+                    Role / Specialty
+                  </label>
+                  <input
+                    type="text"
+                    id="role"
+                    name="role"
+                    className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    placeholder="Orthopedic Surgeon"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-300">
+                    Message (optional)
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={3}
+                    className="w-full resize-none rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    placeholder="Tell us about your use case..."
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={status === "submitting"}
+                  className="w-full rounded-xl bg-teal py-3 font-semibold text-white transition-colors hover:bg-teal-light disabled:opacity-50"
+                >
+                  {status === "submitting" ? "Submitting..." : "Request Access"}
+                </button>
+                {status === "error" && (
+                  <p className="text-center text-sm text-red-400">
+                    Something went wrong. Please try again or email us directly.
+                  </p>
+                )}
+              </form>
+            )}
           </div>
 
           {/* Contact info */}
@@ -126,7 +168,7 @@ export default function ContactPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="mt-0.5 inline-block h-2 w-2 shrink-0 rounded-full bg-teal" />
-                  Free during beta — no credit card required
+                  Free during beta, no credit card required
                 </li>
               </ul>
             </div>
