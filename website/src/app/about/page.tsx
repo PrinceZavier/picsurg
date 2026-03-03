@@ -59,7 +59,7 @@ export default function AboutPage() {
                     She studied interdisciplinary design at Parsons School of Design and
                     sculpture at The School of the Art Institute of Chicago, where she
                     explored innovative fabrication methods including leather molding,
-                    plaster casting, and laser cutting. She holds a B.Arch in Architecture
+                    plaster casting, and laser cutting. She also holds a B.Arch in Architecture
                     and an M.Eng in Construction Engineering and Management from Illinois
                     Institute of Technology.
                   </p>
@@ -70,7 +70,7 @@ export default function AboutPage() {
                     part of the Innovation Medicine (IMED) program at the University of
                     Illinois College of Medicine, where she collaborates on
                     interdisciplinary teams to develop innovative solutions to medical
-                    challenges — including PicSurg.
+                    challenges, including PicSurg.
                   </p>
                 </div>
               </div>
