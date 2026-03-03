@@ -5,7 +5,7 @@ export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
       {/* Abstract grid background */}
-      <div className="absolute inset-0 opacity-[0.07]">
+      <div className="absolute inset-0 opacity-[0.25]">
         <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
@@ -24,12 +24,12 @@ export default function Hero() {
       </div>
 
       {/* Floating abstract shapes */}
-      <div className="absolute top-[15%] left-[10%] h-72 w-72 rounded-full border border-teal/10 opacity-30" />
-      <div className="absolute top-[20%] left-[12%] h-56 w-56 rounded-full border border-cyan/10 opacity-20" />
-      <div className="absolute bottom-[20%] right-[8%] h-96 w-96 rounded-full border border-teal/10 opacity-20" />
-      <div className="absolute bottom-[25%] right-[12%] h-64 w-64 rounded-full border border-cyan/10 opacity-15" />
-      <div className="absolute top-[60%] left-[5%] h-40 w-40 rotate-45 rounded-2xl border border-teal/10 opacity-20" />
-      <div className="absolute top-[10%] right-[15%] h-32 w-32 rotate-12 rounded-2xl border border-cyan/10 opacity-15" />
+      <div className="absolute top-[15%] left-[10%] h-72 w-72 rounded-full border border-teal/30" />
+      <div className="absolute top-[20%] left-[12%] h-56 w-56 rounded-full border border-cyan/20" />
+      <div className="absolute bottom-[20%] right-[8%] h-96 w-96 rounded-full border border-teal/25" />
+      <div className="absolute bottom-[25%] right-[12%] h-64 w-64 rounded-full border border-cyan/20" />
+      <div className="absolute top-[60%] left-[5%] h-40 w-40 rotate-45 rounded-2xl border border-teal/25" />
+      <div className="absolute top-[10%] right-[15%] h-32 w-32 rotate-12 rounded-2xl border border-cyan/20" />
 
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
