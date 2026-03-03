@@ -42,13 +42,13 @@ export default function AboutPage() {
           <div className="space-y-8">
             {/* Isabella */}
             <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8 md:p-10">
-              <div className="flex flex-col gap-6 md:flex-row md:items-start">
+              <div className="flex flex-col gap-8 md:flex-row md:items-start">
                 <Image
                   src="/headshot-isabella.jpg"
                   alt="Isabella Zorra"
-                  width={96}
-                  height={96}
-                  className="h-24 w-24 shrink-0 rounded-2xl object-cover"
+                  width={200}
+                  height={200}
+                  className="h-48 w-48 shrink-0 rounded-2xl object-cover object-top"
                 />
                 <div>
                   <h3 className="mb-1 text-xl font-bold text-white">Isabella Zorra</h3>
