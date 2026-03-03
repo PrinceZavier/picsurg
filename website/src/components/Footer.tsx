@@ -15,6 +15,7 @@ export default function Footer() {
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">Pages</h4>
             <div className="flex flex-col gap-2">
               <Link href="/" className="text-sm text-gray-300 hover:text-teal-light">Home</Link>
+              <Link href="/about" className="text-sm text-gray-300 hover:text-teal-light">About</Link>
               <Link href="/security" className="text-sm text-gray-300 hover:text-teal-light">Security</Link>
               <Link href="/contact" className="text-sm text-gray-300 hover:text-teal-light">Contact & Beta</Link>
             </div>
