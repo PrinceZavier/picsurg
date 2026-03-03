@@ -460,18 +460,51 @@ struct SkeletonView: View {
 
 // MARK: - Inactivity Detection
 
+/// UIKit-based touch passthrough that detects touches without capturing them.
+/// Unlike SwiftUI's DragGesture(minimumDistance: 0), this does not interfere
+/// with TabView taps or other gesture recognizers.
+struct TouchPassthroughView: UIViewRepresentable {
+    let onTouch: () -> Void
+
+    func makeUIView(context: Context) -> TouchPassthroughUIView {
+        TouchPassthroughUIView(onTouch: onTouch)
+    }
+
+    func updateUIView(_ uiView: TouchPassthroughUIView, context: Context) {}
+}
+
+class TouchPassthroughUIView: UIView {
+    let onTouch: () -> Void
+
+    init(onTouch: @escaping () -> Void) {
+        self.onTouch = onTouch
+        super.init(frame: .zero)
+        isUserInteractionEnabled = true
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // Detect the touch but return nil so it passes through to views below
+        if event?.type == .touches {
+            onTouch()
+        }
+        return nil
+    }
+}
+
 struct InactivityDetector: ViewModifier {
     let authService: AuthService
 
     func body(content: Content) -> some View {
         content
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in
-                        if authService.isAuthenticated {
-                            authService.resetInactivityTimer()
-                        }
+            .overlay(
+                TouchPassthroughView {
+                    if authService.isAuthenticated {
+                        authService.resetInactivityTimer()
                     }
+                }
+                .allowsHitTesting(true)
             )
     }
 }

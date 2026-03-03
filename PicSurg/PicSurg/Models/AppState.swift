@@ -240,8 +240,13 @@ final class AppState: ObservableObject {
     }
 
     private func saveScannedPhotoIds() {
-        UserDefaults.standard.set(Array(scannedPhotoIds), forKey: Self.scannedPhotoIdsKey)
-        UserDefaults.standard.set(totalPhotosScanned, forKey: Self.totalScannedKey)
+        // Save on a background thread to avoid blocking UI with large arrays
+        let ids = Array(scannedPhotoIds)
+        let count = totalPhotosScanned
+        Task.detached(priority: .utility) {
+            UserDefaults.standard.set(ids, forKey: AppState.scannedPhotoIdsKey)
+            UserDefaults.standard.set(count, forKey: AppState.totalScannedKey)
+        }
     }
 
     /// Reset batch scanning progress (e.g., when starting fresh)

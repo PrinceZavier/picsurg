@@ -62,13 +62,11 @@ struct ScanButtonView: View {
                             value: isPulsing
                         )
 
-                    // Logo - scale up and clip to circle so colorful wheel fills the teal ring
-                    Image("Logo")
+                    // Circle logo for scan button
+                    Image("LogoCircle")
                         .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 340, height: 340) // Scale up to crop white corners
-                        .clipShape(Circle()) // Clip to circle
-                        .frame(width: 250, height: 250) // Display size (few pixels smaller than teal ring)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 250, height: 250)
                         .overlay(
                             Circle()
                                 .stroke(
@@ -156,6 +154,7 @@ struct HomeView: View {
     @State private var isAddingPhotos = false
     @State private var addedPhotosCount = 0
     @State private var showingAddSuccess = false
+    @State private var showingRescanPrompt = false
 
     private let batchSize = 100
 
@@ -261,6 +260,15 @@ struct HomeView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(errorMessage)
+            }
+            .alert("No New Photos", isPresented: $showingRescanPrompt) {
+                Button("Cancel", role: .cancel) {}
+                Button("Rescan All") {
+                    appState.resetBatchScanProgress()
+                    startScan()
+                }
+            } message: {
+                Text("All photos have been scanned. Would you like to rescan your entire library?")
             }
             .alert("Photos Added", isPresented: $showingAddSuccess) {
                 Button("OK") {}
@@ -468,11 +476,11 @@ struct HomeView: View {
             await MainActor.run {
                 appState.isScanning = false
                 if appState.hasCompletedInitialScan {
-                    errorMessage = "No new photos to scan."
+                    showingRescanPrompt = true
                 } else {
                     errorMessage = "No photos found in your library."
+                    showingError = true
                 }
-                showingError = true
             }
             return
         }
@@ -482,7 +490,7 @@ struct HomeView: View {
         totalBatches = (totalPhotos + batchSize - 1) / batchSize
 
         var allResults: [MLService.ScanResult] = []
-        var scannedIds: [String] = []
+        var allScannedIds: [String] = []
 
         // Process in batches of 100
         for batchIndex in 0..<totalBatches {
@@ -503,7 +511,7 @@ struct HomeView: View {
                 if let image = await photoService.loadThumbnail(for: asset, size: CGSize(width: 300, height: 300)) {
                     imagesToClassify.append((identifier: asset.localIdentifier, image: image))
                 }
-                scannedIds.append(asset.localIdentifier)
+                allScannedIds.append(asset.localIdentifier)
 
                 // Update progress for loading phase (first 50% of this batch's portion)
                 let batchProgress = Float(batchIndex) / Float(totalBatches)
@@ -531,14 +539,13 @@ struct HomeView: View {
                 surgicalPhotosFound = allResults.count
             }
 
-            // Mark this batch as scanned
-            await MainActor.run {
-                appState.markPhotosAsScanned(ids: scannedIds)
-                scannedIds = []
-            }
-
             // Clear memory between batches
             imagesToClassify.removeAll()
+        }
+
+        // Only mark photos as scanned after the full scan completes successfully
+        await MainActor.run {
+            appState.markPhotosAsScanned(ids: allScannedIds)
         }
 
         // Mark initial scan as complete if this was the first full scan

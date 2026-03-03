@@ -603,6 +603,12 @@ final class AuthService: ObservableObject {
     func checkGracePeriodOnForeground() {
         guard isAuthenticated else { return }
 
+        // Don't lock while a scan is in progress
+        guard !AppState.shared.isScanning else {
+            UserDefaults.standard.removeObject(forKey: Self.backgroundTimestampKey)
+            return
+        }
+
         guard let backgroundTimestamp = UserDefaults.standard.object(forKey: Self.backgroundTimestampKey) as? TimeInterval else {
             return
         }
@@ -632,6 +638,11 @@ final class AuthService: ObservableObject {
 
         inactivityTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
             Task { @MainActor in
+                // Don't lock while a scan is in progress
+                guard !AppState.shared.isScanning else {
+                    self?.resetInactivityTimer()
+                    return
+                }
                 self?.lock()
             }
         }
