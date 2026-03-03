@@ -9,8 +9,8 @@ export default function Hero() {
         <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="honeycomb" width="56" height="97" patternUnits="userSpaceOnUse" patternTransform="scale(1.2)">
-              <path d="M28 0 L56 16.5 L56 49.5 L28 66 L0 49.5 L0 16.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.15" />
-              <path d="M28 31 L56 47.5 L56 80.5 L28 97 L0 80.5 L0 47.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.15" />
+              <path d="M28 0 L56 16.5 L56 49.5 L28 66 L0 49.5 L0 16.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.25" />
+              <path d="M28 31 L56 47.5 L56 80.5 L28 97 L0 80.5 L0 47.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.25" />
             </pattern>
             <radialGradient id="hex-fade" cx="50%" cy="50%" r="60%">
               <stop offset="0%" stopColor="white" stopOpacity="1" />
