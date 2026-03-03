@@ -1,6 +1,5 @@
 import SwiftUI
 import Photos
-import PhotosUI
 
 /// Vault view showing secured photos with multi-select support
 struct VaultView: View {
@@ -18,11 +17,10 @@ struct VaultView: View {
     @State private var showingDeleteConfirmation = false
     @State private var isPreparingShare = false
     @State private var showingPhotoPicker = false
-    @State private var selectedPickerItems: [PhotosPickerItem] = []
     @State private var isAddingPhotos = false
     @State private var addedPhotosCount = 0
     @State private var showingAddSuccess = false
-    @State private var pendingPickerItems: [PhotosPickerItem] = []
+    @State private var pendingAssets: [PHAsset] = []
     @State private var showingManualAddConfirm = false
 
     private var selectedCount: Int {
@@ -123,12 +121,12 @@ struct VaultView: View {
                     deletePhoto(photo)
                 })
             }
-            .photosPicker(isPresented: $showingPhotoPicker, selection: $selectedPickerItems, maxSelectionCount: 50, matching: .images)
-            .onChange(of: selectedPickerItems) { newItems in
-                if !newItems.isEmpty {
-                    pendingPickerItems = newItems
-                    selectedPickerItems = []
-                    showingManualAddConfirm = true
+            .sheet(isPresented: $showingPhotoPicker) {
+                LimitedPhotoPickerView(maxSelection: 50) { selectedAssets in
+                    if !selectedAssets.isEmpty {
+                        pendingAssets = selectedAssets
+                        showingManualAddConfirm = true
+                    }
                 }
             }
             .alert("Error", isPresented: $showingError) {
@@ -149,15 +147,15 @@ struct VaultView: View {
             } message: {
                 Text("\(addedPhotosCount) photo\(addedPhotosCount == 1 ? "" : "s") secured in your vault.")
             }
-            .alert("Secure \(pendingPickerItems.count) Photo\(pendingPickerItems.count == 1 ? "" : "s")?", isPresented: $showingManualAddConfirm) {
+            .alert("Secure \(pendingAssets.count) Photo\(pendingAssets.count == 1 ? "" : "s")?", isPresented: $showingManualAddConfirm) {
                 Button("Cancel", role: .cancel) {
-                    pendingPickerItems = []
+                    pendingAssets = []
                 }
                 Button("Secure & Remove") {
-                    addPhotosManually(pendingPickerItems)
+                    addPhotosManually(pendingAssets)
                 }
             } message: {
-                Text("This will encrypt and remove \(pendingPickerItems.count == 1 ? "this photo" : "these photos") from your camera roll. For full privacy, empty your Recently Deleted folder afterwards.")
+                Text("This will encrypt and remove \(pendingAssets.count == 1 ? "this photo" : "these photos") from your camera roll. For full privacy, empty your Recently Deleted folder afterwards.")
             }
             .overlay {
                 if isPreparingShare || isAddingPhotos {
@@ -474,42 +472,35 @@ struct VaultView: View {
         }
     }
 
-    private func addPhotosManually(_ items: [PhotosPickerItem]) {
+    private func addPhotosManually(_ assets: [PHAsset]) {
         isAddingPhotos = true
-        pendingPickerItems = []
+        pendingAssets = []
 
         Task {
             var successCount = 0
-            var assetIdentifiers: [String] = []
+            var assetsToDelete: [PHAsset] = []
 
-            for item in items {
+            for asset in assets {
                 do {
-                    if let data = try await item.loadTransferable(type: Data.self) {
-                        _ = try VaultService.shared.addPhoto(
-                            imageData: data,
-                            originalDate: Date()
-                        )
-                        successCount += 1
-                        if let assetId = item.itemIdentifier {
-                            assetIdentifiers.append(assetId)
-                        }
-                    }
+                    let data = try await PhotoService.shared.loadFullResolutionImageData(for: asset)
+                    _ = try VaultService.shared.addPhoto(
+                        imageData: data,
+                        originalDate: asset.creationDate ?? Date(),
+                        originalAssetId: asset.localIdentifier
+                    )
+                    successCount += 1
+                    assetsToDelete.append(asset)
                 } catch {
                     print("Failed to add photo: \(error)")
                 }
             }
 
             // Delete originals from camera roll
-            if !assetIdentifiers.isEmpty {
-                let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: assetIdentifiers, options: nil)
-                if fetchResult.count > 0 {
-                    do {
-                        try await PHPhotoLibrary.shared().performChanges {
-                            PHAssetChangeRequest.deleteAssets(fetchResult)
-                        }
-                    } catch {
-                        print("Failed to delete from camera roll: \(error)")
-                    }
+            if !assetsToDelete.isEmpty {
+                do {
+                    try await PhotoService.shared.deletePhotos(assetsToDelete)
+                } catch {
+                    print("Failed to delete from camera roll: \(error)")
                 }
             }
 
@@ -703,7 +694,7 @@ struct SecurePhotoView: View {
                 restoreToPhotoLibrary()
             }
         } message: {
-            Text("This will save the photo back to your camera roll. The photo will remain in your vault.")
+            Text("This will save the photo back to your camera roll. The photo will also continue to remain in your vault.")
         }
         .alert("Photo Restored", isPresented: $showingRestoreSuccess) {
             Button("OK") {}
