@@ -17,14 +17,11 @@ export default function Header() {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-8 md:flex">
+          <Link href="/" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
+            Home
+          </Link>
           <Link href="/security" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
-            Security
-          </Link>
-          <Link href="/contact" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
-            Beta Access
-          </Link>
-          <Link href="/legal" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
-            Legal
+            Security & Legal
           </Link>
           <Link
             href="/contact"
@@ -50,14 +47,11 @@ export default function Header() {
       {menuOpen && (
         <div className="border-t border-white/10 bg-background/95 backdrop-blur-md md:hidden">
           <div className="flex flex-col gap-4 px-6 py-6">
+            <Link href="/" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
+              Home
+            </Link>
             <Link href="/security" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
-              Security
-            </Link>
-            <Link href="/contact" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
-              Beta Access
-            </Link>
-            <Link href="/legal" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
-              Legal
+              Security & Legal
             </Link>
             <Link
               href="/contact"

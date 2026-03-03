@@ -15,15 +15,15 @@ export default function Footer() {
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">Pages</h4>
             <div className="flex flex-col gap-2">
               <Link href="/" className="text-sm text-gray-300 hover:text-teal-light">Home</Link>
-              <Link href="/security" className="text-sm text-gray-300 hover:text-teal-light">Security & Privacy</Link>
+              <Link href="/security" className="text-sm text-gray-300 hover:text-teal-light">Security</Link>
               <Link href="/contact" className="text-sm text-gray-300 hover:text-teal-light">Contact & Beta</Link>
             </div>
           </div>
           <div>
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-400">Legal</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/legal#privacy" className="text-sm text-gray-300 hover:text-teal-light">Privacy Policy</Link>
-              <Link href="/legal#terms" className="text-sm text-gray-300 hover:text-teal-light">Terms of Service</Link>
+              <Link href="/security#privacy" className="text-sm text-gray-300 hover:text-teal-light">Privacy Policy</Link>
+              <Link href="/security#terms" className="text-sm text-gray-300 hover:text-teal-light">Terms of Service</Link>
             </div>
           </div>
         </div>
