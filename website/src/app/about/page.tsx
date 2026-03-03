@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About — PicSurg",
@@ -42,10 +43,13 @@ export default function AboutPage() {
             {/* Isabella */}
             <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8 md:p-10">
               <div className="flex flex-col gap-6 md:flex-row md:items-start">
-                {/* Avatar placeholder */}
-                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-teal to-cyan text-3xl font-bold text-white">
-                  IZ
-                </div>
+                <Image
+                  src="/headshot-isabella.jpg"
+                  alt="Isabella Zorra"
+                  width={96}
+                  height={96}
+                  className="h-24 w-24 shrink-0 rounded-2xl object-cover"
+                />
                 <div>
                   <h3 className="mb-1 text-xl font-bold text-white">Isabella Zorra</h3>
                   <p className="mb-4 text-sm font-medium text-teal-light">Founder & Developer</p>
