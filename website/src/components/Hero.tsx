@@ -4,32 +4,26 @@ import Image from "next/image";
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-20">
-      {/* Abstract grid background */}
-      <div className="absolute inset-0 opacity-[0.25]">
+      {/* Honeycomb mesh background */}
+      <div className="absolute inset-0">
         <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-teal" />
+            <pattern id="honeycomb" width="56" height="97" patternUnits="userSpaceOnUse" patternTransform="scale(1.2)">
+              <path d="M28 0 L56 16.5 L56 49.5 L28 66 L0 49.5 L0 16.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.15" />
+              <path d="M28 31 L56 47.5 L56 80.5 L28 97 L0 80.5 L0 47.5 Z" fill="none" stroke="#0891b2" strokeWidth="0.5" opacity="0.15" />
             </pattern>
-            <radialGradient id="grid-fade" cx="50%" cy="50%" r="50%">
+            <radialGradient id="hex-fade" cx="50%" cy="50%" r="60%">
               <stop offset="0%" stopColor="white" stopOpacity="1" />
+              <stop offset="70%" stopColor="white" stopOpacity="0.4" />
               <stop offset="100%" stopColor="white" stopOpacity="0" />
             </radialGradient>
-            <mask id="grid-mask">
-              <rect width="100%" height="100%" fill="url(#grid-fade)" />
+            <mask id="hex-mask">
+              <rect width="100%" height="100%" fill="url(#hex-fade)" />
             </mask>
           </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" mask="url(#grid-mask)" />
+          <rect width="100%" height="100%" fill="url(#honeycomb)" mask="url(#hex-mask)" />
         </svg>
       </div>
-
-      {/* Floating abstract shapes */}
-      <div className="absolute top-[15%] left-[10%] h-72 w-72 rounded-full border border-teal/30" />
-      <div className="absolute top-[20%] left-[12%] h-56 w-56 rounded-full border border-cyan/20" />
-      <div className="absolute bottom-[20%] right-[8%] h-96 w-96 rounded-full border border-teal/25" />
-      <div className="absolute bottom-[25%] right-[12%] h-64 w-64 rounded-full border border-cyan/20" />
-      <div className="absolute top-[60%] left-[5%] h-40 w-40 rotate-45 rounded-2xl border border-teal/25" />
-      <div className="absolute top-[10%] right-[15%] h-32 w-32 rotate-12 rounded-2xl border border-cyan/20" />
 
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
