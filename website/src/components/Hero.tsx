@@ -55,7 +55,7 @@ export default function Hero() {
 
         <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-400 md:text-xl">
           PicSurg uses machine learning to detect operative photos in your camera roll
-          and locks them in a HIPAA-compliant encrypted vault — so your personal and
+          and locks them in a HIPAA-compliant encrypted vault, so your personal and
           professional photos stay separate.
         </p>
 

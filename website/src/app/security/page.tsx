@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Security & Legal — PicSurg",
+  title: "Security & Legal | PicSurg",
   description: "How PicSurg protects your surgical photos with AES-256 encryption, biometric authentication, and HIPAA-compliant design. Plus our Privacy Policy and Terms of Service.",
 };
 
@@ -15,7 +15,7 @@ const sections = [
       </svg>
     ),
     items: [
-      "All photo analysis happens entirely on your device — no images are ever sent externally",
+      "All photo analysis happens entirely on your device. No images are ever sent externally",
       "The ML model runs locally with no internet connection required",
       "Photo classification takes milliseconds per image on modern iPhones",
     ],
@@ -28,7 +28,7 @@ const sections = [
       </svg>
     ),
     items: [
-      "Every photo is individually encrypted using AES-256-GCM — the same standard used by governments and financial institutions",
+      "Every photo is individually encrypted using AES-256-GCM, the same standard used by governments and financial institutions",
       "Encryption keys are securely stored in the iOS Keychain and never leave your device",
       "Each encryption operation uses a unique random value, so no two encrypted files are alike",
     ],
@@ -42,7 +42,7 @@ const sections = [
     ),
     items: [
       "Face ID and Touch ID with a 6-digit PIN fallback",
-      "Auto-locks when backgrounded — every session requires fresh authentication",
+      "Auto-locks when backgrounded, requiring fresh authentication every session",
       "Built-in lockout and recovery features protect against unauthorized access",
     ],
   },
@@ -54,7 +54,7 @@ const sections = [
       </svg>
     ),
     items: [
-      "Photos never leave your device — no servers, no cloud storage",
+      "Photos never leave your device. No servers, no cloud storage",
       "Vault excluded from iCloud and iTunes backups by default",
       "Anonymous usage analytics contain no photos or identifiable data",
     ],
@@ -68,7 +68,7 @@ const sections = [
     ),
     items: [
       "Designed to support HIPAA Security Rule requirements for Protected Health Information (PHI)",
-      "No PHI is ever transmitted — patient photos and data stay on your device",
+      "No PHI is ever transmitted. Patient photos and data stay on your device",
       "Built primarily on Apple first-party frameworks for security and reliability",
     ],
   },
@@ -146,7 +146,7 @@ export default function SecurityPage() {
                 PicSurg (&quot;we&quot;, &quot;our&quot;, or &quot;the App&quot;) is committed to protecting
                 your privacy. This Privacy Policy explains how we handle information when
                 you use our iOS application. PicSurg is designed with a privacy-first
-                approach — all data processing occurs on your device.
+                approach where all data processing occurs on your device.
               </p>
             </div>
 
@@ -325,7 +325,7 @@ export default function SecurityPage() {
               <p>
                 PicSurg is a photo management tool. It does not provide medical advice,
                 diagnosis, or treatment. The App does not analyze the medical content of
-                photos — it only classifies whether a photo appears to be surgical in nature.
+                photos. It only classifies whether a photo appears to be surgical in nature.
               </p>
             </div>
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "About — PicSurg",
+  title: "About | PicSurg",
   description: "Meet the team behind PicSurg.",
 };
 
@@ -27,7 +27,7 @@ export default function AboutPage() {
           <p className="text-gray-300 leading-relaxed">
             PicSurg was born from a simple problem: surgical photos and personal photos
             shouldn&apos;t live in the same camera roll. Healthcare providers take operative
-            photos daily for documentation, education, and patient care — but these
+            photos daily for documentation, education, and patient care, but these
             sensitive images sit alongside personal memories with no separation or
             protection. PicSurg uses machine learning to automatically detect surgical
             photos and secure them in a HIPAA-compliant encrypted vault, giving

@@ -198,19 +198,19 @@ export default function ContactPage() {
               <ol className="space-y-4 text-gray-400">
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">1</span>
-                  <span><span className="font-medium text-white">Sign up</span> — fill out this form to request access</span>
+                  <span><span className="font-medium text-white">Sign up</span>: fill out this form to request access</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">2</span>
-                  <span><span className="font-medium text-white">Get the app</span> — receive a TestFlight invite via email</span>
+                  <span><span className="font-medium text-white">Get the app</span>: receive a TestFlight invite via email</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">3</span>
-                  <span><span className="font-medium text-white">Use PicSurg</span> — try it in your workflow for a few weeks</span>
+                  <span><span className="font-medium text-white">Use PicSurg</span>: try it in your workflow for a few weeks</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">4</span>
-                  <span><span className="font-medium text-white">Give feedback</span> — complete a short survey about your experience</span>
+                  <span><span className="font-medium text-white">Give feedback</span>: complete a short survey about your experience</span>
                 </li>
               </ol>
             </div>

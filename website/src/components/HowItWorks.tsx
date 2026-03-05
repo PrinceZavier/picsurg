@@ -7,7 +7,7 @@ const steps = [
   {
     number: "02",
     title: "Review",
-    description: "Review the identified photos with confidence scores. Select which ones you want to secure — you're always in control.",
+    description: "Review the identified photos with confidence scores. Select which ones you want to secure. You're always in control.",
   },
   {
     number: "03",
