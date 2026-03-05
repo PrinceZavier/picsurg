@@ -55,8 +55,8 @@ export default function ContactPage() {
         </div>
 
         <div className="grid gap-12 md:grid-cols-2">
-          {/* Beta signup form */}
-          <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
+          {/* Beta signup form — shows second on mobile, first (left) on desktop */}
+          <div className="order-2 rounded-2xl border border-white/10 bg-navy-light/50 p-8 md:order-1">
             <h2 className="mb-6 text-2xl font-bold text-white">Request Beta Access</h2>
 
             {status === "success" ? (
@@ -191,8 +191,8 @@ export default function ContactPage() {
             )}
           </div>
 
-          {/* Sidebar info */}
-          <div className="space-y-8">
+          {/* Sidebar info — shows first on mobile, second (right) on desktop */}
+          <div className="order-1 space-y-8 md:order-2">
             <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
               <h2 className="mb-4 text-2xl font-bold text-white">How It Works</h2>
               <ol className="space-y-4 text-gray-400">
