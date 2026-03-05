@@ -15,9 +15,8 @@ const sections = [
       </svg>
     ),
     items: [
-      "All photo analysis happens entirely on your device using Apple's Core ML framework",
-      "No images are ever sent to external servers or cloud services",
-      "The ML model runs locally — no internet connection required for scanning",
+      "All photo analysis happens entirely on your device — no images are ever sent externally",
+      "The ML model runs locally with no internet connection required",
       "Photo classification takes milliseconds per image on modern iPhones",
     ],
   },
@@ -42,10 +41,9 @@ const sections = [
       </svg>
     ),
     items: [
-      "Face ID and Touch ID provide fast, secure biometric authentication",
-      "6-digit PIN serves as a fallback when biometrics are unavailable",
-      "The app automatically locks when backgrounded — every session requires fresh authentication",
-      "Built-in lockout and recovery features protect against unauthorized access attempts",
+      "Face ID and Touch ID with a 6-digit PIN fallback",
+      "Auto-locks when backgrounded — every session requires fresh authentication",
+      "Built-in lockout and recovery features protect against unauthorized access",
     ],
   },
   {
@@ -57,10 +55,8 @@ const sections = [
     ),
     items: [
       "Photos never leave your device — no servers, no cloud storage",
-      "Vault is excluded from iCloud and iTunes backups by default",
-      "Restore photos to your camera roll or share securely at any time",
-      "Full data deletion available in Settings — wipe everything with one tap",
-      "Anonymous usage analytics help us improve the app — no photos or identifiable data are ever sent",
+      "Vault excluded from iCloud and iTunes backups by default",
+      "Anonymous usage analytics contain no photos or identifiable data",
     ],
   },
   {
@@ -73,8 +69,6 @@ const sections = [
     items: [
       "Designed to support HIPAA Security Rule requirements for Protected Health Information (PHI)",
       "No PHI is ever transmitted — patient photos and data stay on your device",
-      "Authentication and access controls protect every session",
-      "Activity logging tracks key operations for accountability",
       "Built primarily on Apple first-party frameworks for security and reliability",
     ],
   },
