@@ -72,7 +72,7 @@ This document describes the technical architecture for PicSurg, an iOS applicati
 | **Auth Service** | Handles Face ID, Touch ID, PIN (PBKDF2), auto-wipe, session management |
 | **Crypto Service** | Encrypts photos before storage, decrypts when viewing (AES-256) |
 | **Reminder Service** | Manages scan reminder notifications (daily/weekly) |
-| **Analytics Service** | Anonymous behavioral analytics via TelemetryDeck (16 events) |
+| **Analytics Service** | Anonymous behavioral analytics via TelemetryDeck (17 events including crash detection) |
 | **Storage Service** | Low-level file system operations for the encrypted vault |
 
 ---

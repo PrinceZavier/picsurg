@@ -21,6 +21,9 @@ enum AnalyticsEvent: String {
     case settingsChanged = "settings_changed"
     case authAttempt = "auth_attempt"
     case manualAddOpened = "manual_add_opened"
+
+    // Stability
+    case appCrashDetected = "app_crash_detected"
 }
 
 /// Lightweight analytics service wrapping TelemetryDeck
@@ -31,6 +34,7 @@ final class AnalyticsService {
     private static let appID = "CBB8AE8C-C837-448F-8B57-590628AAAF6E"
 
     private static let lastOpenKey = "com.picsurg.analytics.lastAppOpen"
+    private static let cleanExitKey = "com.picsurg.analytics.cleanExit"
 
     private var isInitialized = false
 
@@ -55,6 +59,26 @@ final class AnalyticsService {
         #endif
 
         TelemetryDeck.signal(event.rawValue, parameters: parameters)
+    }
+
+    /// Check if the previous session crashed (didn't exit cleanly).
+    /// Call once after initialize().
+    func checkForCrash() {
+        let hadCleanExit = UserDefaults.standard.bool(forKey: Self.cleanExitKey)
+        // On very first launch, key doesn't exist — don't report a crash
+        let isFirstLaunch = UserDefaults.standard.object(forKey: Self.cleanExitKey) == nil
+
+        if !isFirstLaunch && !hadCleanExit {
+            track(.appCrashDetected)
+        }
+
+        // Mark as NOT clean — will be set to true on normal background/terminate
+        UserDefaults.standard.set(false, forKey: Self.cleanExitKey)
+    }
+
+    /// Mark that the app is exiting cleanly (backgrounding or terminating).
+    func markCleanExit() {
+        UserDefaults.standard.set(true, forKey: Self.cleanExitKey)
     }
 
     /// Track app opened with days-since-last-open metadata.

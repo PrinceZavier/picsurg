@@ -501,7 +501,7 @@ This keeps the UI responsive during scanning.
 - Free tier sufficient for beta testing
 - No PHI ever leaves the device — only event names, counts, durations
 
-**Implementation**: Singleton `AnalyticsService` wrapping TelemetryDeck with type-safe `AnalyticsEvent` enum (16 events). Debug logging in `#if DEBUG` builds.
+**Implementation**: Singleton `AnalyticsService` wrapping TelemetryDeck with type-safe `AnalyticsEvent` enum (17 events). Debug logging in `#if DEBUG` builds. Includes crash detection via clean-exit flag pattern — if the app didn't call `markCleanExit()` before terminating, the next launch reports an `appCrashDetected` event.
 
 **File**: [AnalyticsService.swift](../PicSurg/PicSurg/Services/AnalyticsService.swift)
 

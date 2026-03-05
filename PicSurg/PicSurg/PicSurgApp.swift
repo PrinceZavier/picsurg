@@ -14,6 +14,7 @@ struct PicSurgApp: App {
 
     init() {
         AnalyticsService.shared.initialize()
+        AnalyticsService.shared.checkForCrash()
     }
 
     var body: some Scene {
@@ -23,6 +24,7 @@ struct PicSurgApp: App {
                 .environmentObject(authService)
                 .detectInactivity(authService: authService)
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                    AnalyticsService.shared.markCleanExit()
                     if authService.isAuthenticated {
                         authService.recordBackgroundTimestamp()
                         authService.stopInactivityTimer()

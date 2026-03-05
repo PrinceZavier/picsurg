@@ -122,7 +122,7 @@ An intelligent iOS app that:
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Anonymous behavioral analytics for beta testing via TelemetryDeck |
-| **Events Tracked** | 16 events: scan usage, vault activity, review funnel, auth, settings, onboarding |
+| **Events Tracked** | 17 events: scan usage, vault activity, review funnel, auth, settings, onboarding, crash detection |
 | **Privacy** | No PHI transmitted — only event names, counts, durations, feature toggles |
 | **Provider** | TelemetryDeck (privacy-first, GDPR-compliant, auto-hashed device IDs) |
 | **Priority** | P1 - Implemented |

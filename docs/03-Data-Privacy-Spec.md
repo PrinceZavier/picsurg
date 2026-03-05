@@ -281,7 +281,7 @@ App Launch ──▶ Require Auth ──▶ Unlock ──▶ Active Session
 | Internet connection | Minimal | Analytics signals only (no PHI) |
 | iCloud sync | No | Vault excluded from backup |
 | Analytics | Yes | TelemetryDeck — anonymous behavioral events only |
-| Crash reporting | No | No third-party services |
+| Crash reporting | Basic | Clean-exit flag detects non-graceful terminations; sends anonymous `app_crash_detected` event via TelemetryDeck (no PHI) |
 | Remote ML model | No | Model bundled in app |
 
 ### 9.2 Analytics Data Sent
