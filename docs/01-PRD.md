@@ -1,8 +1,8 @@
 # PicSurg - Product Requirements Document (PRD)
 
-**Version:** 1.2
-**Last Updated:** March 2, 2026
-**Status:** MVP Complete + Phase 6 Enhancements
+**Version:** 1.3
+**Last Updated:** March 5, 2026
+**Status:** MVP Complete + Phase 7 (Analytics & Privacy Enhancements)
 
 ---
 
@@ -118,9 +118,26 @@ An intelligent iOS app that:
 | **Customization** | Time of day and weekday (for weekly) |
 | **Priority** | P1 - Implemented |
 
+#### F8: Anonymous Beta Analytics ✅ IMPLEMENTED
+| Attribute | Requirement |
+|-----------|-------------|
+| **Description** | Anonymous behavioral analytics for beta testing via TelemetryDeck |
+| **Events Tracked** | 16 events: scan usage, vault activity, review funnel, auth, settings, onboarding |
+| **Privacy** | No PHI transmitted — only event names, counts, durations, feature toggles |
+| **Provider** | TelemetryDeck (privacy-first, GDPR-compliant, auto-hashed device IDs) |
+| **Priority** | P1 - Implemented |
+
+#### F9: Limited Photo Access Compliance ✅ IMPLEMENTED
+| Attribute | Requirement |
+|-----------|-------------|
+| **Description** | Custom photo picker that respects iOS Limited Photo Access |
+| **Use Case** | Manual photo addition only shows photos user has authorized |
+| **Manage Access** | "Manage Access" button to expand authorized photo selection |
+| **Priority** | P1 - Implemented |
+
 ### 3.2 Future Features (Post-MVP)
 
-#### F8: Background Automatic Scanning
+#### F10: Background Automatic Scanning
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Scan for new photos automatically in background |
@@ -128,7 +145,7 @@ An intelligent iOS app that:
 | **Frequency** | Configurable (hourly, daily, weekly) |
 | **Priority** | P1 - High (complex, defer if needed for MVP) |
 
-#### F9: Export/Share Functionality ✅ IMPLEMENTED
+#### F11: Export/Share Functionality ✅ IMPLEMENTED
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Securely export photos from vault |
@@ -137,14 +154,14 @@ An intelligent iOS app that:
 | **Single Share** | Share individual photos from detail view |
 | **Priority** | P0 - Implemented in MVP |
 
-#### F10: Search & Organization
+#### F12: Search & Organization
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Search and organize vault photos |
 | **Features** | Tags, folders, date filtering, text search |
 | **Priority** | P2 - Medium |
 
-#### F11: Cloud Backup
+#### F13: Cloud Backup
 | Attribute | Requirement |
 |-----------|-------------|
 | **Description** | Encrypted backup to iCloud or secure server |
@@ -176,14 +193,16 @@ An intelligent iOS app that:
 | US9 | Healthcare provider | Export photos securely | I can share for consultations | ✅ Implemented |
 | US10 | Healthcare provider | Have my data auto-wiped on too many failed attempts | My data is safe if phone is stolen | ✅ Implemented |
 | US11 | Healthcare provider | Configure session lock timing | I control the security/convenience tradeoff | ✅ Implemented |
+| US12 | Developer | See anonymous usage analytics | I understand scan frequency, vault volume, and friction points during beta | ✅ Implemented |
+| US13 | Healthcare provider | Only see authorized photos in manual picker | Limited Photo Access is respected throughout the app | ✅ Implemented |
 
 ### Post-MVP User Stories
 
 | ID | As a... | I want to... | So that... |
 |----|---------|--------------|------------|
-| US12 | Healthcare provider | Have photos scanned automatically | I don't have to remember to scan |
-| US13 | Healthcare provider | Organize photos by case/patient | I can find images when needed |
-| US14 | Healthcare provider | Back up vault to cloud | I don't lose photos if phone lost |
+| US14 | Healthcare provider | Have photos scanned automatically | I don't have to remember to scan |
+| US15 | Healthcare provider | Organize photos by case/patient | I can find images when needed |
+| US16 | Healthcare provider | Back up vault to cloud | I don't lose photos if phone lost |
 
 ---
 

@@ -1,8 +1,8 @@
 # PicSurg - Technical Architecture Document
 
-**Version:** 1.2
-**Last Updated:** March 2, 2026
-**Status:** MVP Complete + Phase 6 Enhancements
+**Version:** 1.3
+**Last Updated:** March 5, 2026
+**Status:** MVP Complete + Phase 7 (Analytics & Privacy Enhancements)
 
 ---
 
@@ -22,6 +22,7 @@ This document describes the technical architecture for PicSurg, an iOS applicati
 | Security | CryptoKit, LocalAuthentication |
 | Storage | FileManager (encrypted files), UserDefaults |
 | Background Tasks | BackgroundTasks framework |
+| Analytics | TelemetryDeck (privacy-first, GDPR-compliant) |
 
 ---
 
@@ -71,6 +72,7 @@ This document describes the technical architecture for PicSurg, an iOS applicati
 | **Auth Service** | Handles Face ID, Touch ID, PIN (PBKDF2), auto-wipe, session management |
 | **Crypto Service** | Encrypts photos before storage, decrypts when viewing (AES-256) |
 | **Reminder Service** | Manages scan reminder notifications (daily/weekly) |
+| **Analytics Service** | Anonymous behavioral analytics via TelemetryDeck (16 events) |
 | **Storage Service** | Low-level file system operations for the encrypted vault |
 
 ---
@@ -114,6 +116,7 @@ PicSurg/
 │   │
 │   └── Components/
 │       ├── AuthenticationView.swift
+│       ├── LimitedPhotoPickerView.swift  # Custom picker respecting Limited Photo Access
 │       ├── LoadingOverlay.swift
 │       └── PhotoThumbnail.swift
 │
@@ -131,6 +134,7 @@ PicSurg/
 │   ├── AuthService.swift         # Biometric/PIN auth
 │   ├── CryptoService.swift       # Encryption/decryption
 │   ├── StorageService.swift      # File system operations
+│   ├── AnalyticsService.swift    # TelemetryDeck analytics
 │   └── BackgroundScanService.swift # Background task handling
 │
 ├── ML/
@@ -770,8 +774,9 @@ class HomeViewModel: ObservableObject {
 | UserNotifications | Scan Reminders | Apple Framework |
 | CommonCrypto | PBKDF2 Key Derivation | Apple Framework |
 | BackgroundTasks | Background Processing | Apple Framework |
+| TelemetryDeck | Anonymous behavioral analytics | Third-party (SPM) |
 
-**Note:** All dependencies are first-party Apple frameworks. No third-party dependencies required for MVP.
+**Note:** TelemetryDeck is the only third-party dependency. It is privacy-first, GDPR-compliant, and auto-hashes device identifiers. No PHI is ever sent — only event names, counts, durations, and feature toggle states.
 
 ---
 

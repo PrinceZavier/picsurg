@@ -1,7 +1,7 @@
 # PicSurg - Technical Decisions & Solutions
 
-**Version:** 1.0
-**Last Updated:** January 2026
+**Version:** 1.1
+**Last Updated:** March 5, 2026
 
 This document explains the technical decisions made during development and how specific problems were solved. It serves as a reference for understanding why certain approaches were chosen.
 
@@ -15,6 +15,7 @@ This document explains the technical decisions made during development and how s
 4. [Edge Cases & Solutions](#4-edge-cases--solutions)
 5. [Security Decisions](#5-security-decisions)
 6. [Performance Optimizations](#6-performance-optimizations)
+7. [Analytics Integration](#7-analytics-integration)
 
 ---
 
@@ -405,15 +406,15 @@ if localFailedCount > 0 {
 - Key never leaves device
 - Protected by device passcode
 
-### PIN Storage: Hashed Only
+### PIN Storage: PBKDF2
 
-**Choice**: Store SHA-256 hash of PIN, not the PIN itself
+**Choice**: Store PBKDF2-HMAC-SHA256 hash of PIN (100K iterations, 32-byte random salt)
 
 **Rationale**:
 - PIN cannot be recovered even if Keychain is compromised
-- Standard security practice
-
-**Note**: For production, consider using proper KDF like PBKDF2 or Argon2 (documented in Issue #1)
+- PBKDF2 with high iteration count makes brute-force impractical
+- Constant-time comparison prevents timing attacks
+- Upgraded from SHA-256 in Phase 6
 
 ### Vault Exclusion from Backups
 
@@ -478,6 +479,58 @@ return try await Task.detached(priority: .userInitiated) {
 ```
 
 This keeps the UI responsive during scanning.
+
+---
+
+## 7. Analytics Integration
+
+### Decision: TelemetryDeck for Beta Analytics
+
+**Choice**: TelemetryDeck (Swift-native, privacy-first, GDPR-compliant)
+
+**Alternatives Considered**:
+- **Mixpanel**: More powerful but collects PII by default, overkill for beta
+- **PostHog**: Self-hosted option but complex setup, not Swift-native
+- **Apple Analytics**: Limited to App Store distribution, no custom events
+- **Firebase Analytics**: Google dependency, privacy concerns for medical app
+
+**Rationale**:
+- Swift-native SDK — lightweight SPM integration
+- Auto-hashes device identifiers — no PII transmitted
+- GDPR/privacy-first by design — critical for medical app
+- Free tier sufficient for beta testing
+- No PHI ever leaves the device — only event names, counts, durations
+
+**Implementation**: Singleton `AnalyticsService` wrapping TelemetryDeck with type-safe `AnalyticsEvent` enum (16 events). Debug logging in `#if DEBUG` builds.
+
+**File**: [AnalyticsService.swift](../PicSurg/PicSurg/Services/AnalyticsService.swift)
+
+---
+
+### Problem: System PhotosPicker Bypasses Limited Photo Access
+
+**Symptom**: When user grants "Limited Access" to photos, the system `PhotosPicker` (PHPickerViewController) still displays the entire camera roll.
+
+**Root Cause**: Apple's PHPickerViewController runs in a separate process and intentionally shows all photos — it's designed to let users pick freely while only returning selected items to the app.
+
+**Solution**: Built custom `LimitedPhotoPickerView` using `PHPhotoLibrary` + `PHAsset.fetchAssets` which respects Limited Access, showing only authorized photos.
+
+```swift
+// Custom picker uses PHPhotoLibrary (respects Limited Access)
+let fetchedAssets = PhotoService.shared.fetchAllPhotos()
+// Only returns photos user has explicitly authorized
+
+// "Manage Access" button lets users expand their selection
+PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: viewController)
+```
+
+**Key Features**:
+- Shows only authorized photos (like Instagram)
+- "Manage Access" button via `presentLimitedLibraryPicker`
+- Banner: "Showing only photos you've granted access to"
+- Empty state with guidance when no photos authorized
+
+**File**: [LimitedPhotoPickerView.swift](../PicSurg/PicSurg/Views/Components/LimitedPhotoPickerView.swift)
 
 ---
 

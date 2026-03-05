@@ -1,8 +1,8 @@
 # PicSurg - Implementation Roadmap
 
-**Version:** 1.2
-**Last Updated:** March 2, 2026
-**Status:** MVP Complete + Phase 6 Enhancements
+**Version:** 1.3
+**Last Updated:** March 5, 2026
+**Status:** MVP Complete + Phase 7 (Analytics & Privacy Enhancements)
 
 ---
 
@@ -25,6 +25,7 @@ This roadmap breaks down PicSurg development into phases. The goal is to get a w
 | **Phase 4** | Polish | ✅ Complete |
 | **Phase 5** | Feb 2026 Enhancements | ✅ Complete |
 | **Phase 6** | March 2026 Enhancements | ✅ Complete |
+| **Phase 7** | Analytics & Privacy | ✅ Complete |
 | **Future** | Planned Enhancements | Planned |
 
 ---
@@ -389,52 +390,99 @@ See detailed explanations in [05-Technical-Decisions.md](05-Technical-Decisions.
 
 ---
 
-## 10. Future Enhancements (Post-MVP)
+## 10. Phase 7: Analytics & Privacy Enhancements ✅
 
-### 10.1 Batch Scanning Enhancements
+**Goal**: Add anonymous behavioral analytics for beta testing and fix Limited Photo Access bypass in manual photo picker.
+
+### Tasks
+
+#### 7.1 TelemetryDeck Analytics Integration ✅
+- [x] Add TelemetryDeck SPM dependency (first third-party package)
+- [x] Create `AnalyticsService.swift` singleton with type-safe event enum
+- [x] 16 analytics events covering scan, review, vault, auth, settings, and onboarding
+- [x] Debug console logging (`[Analytics]` prefix) in DEBUG builds
+- [x] Fire-and-forget pattern — never blocks UI
+
+#### 7.2 Analytics Instrumentation ✅
+- [x] `PicSurgApp.swift` — app opened with days-since-last-open
+- [x] `HomeView.swift` — scan initiated/completed, manual add opened, photos vaulted (manual)
+- [x] `ReviewView.swift` — review opened/completed/cancelled, photos vaulted (scan), approval rate
+- [x] `VaultView.swift` — vault viewed, photo deleted/shared/restored
+- [x] `SettingsView.swift` — settings changed (biometric, auto-wipe, grace period, timeout, reminders)
+- [x] `LockScreenView.swift` — auth attempt (PIN/biometric, success/failure)
+- [x] `OnboardingView.swift` — onboarding completed with biometric/reminders choices
+
+#### 7.3 Limited Photo Access Compliance ✅
+- [x] Replace system `PhotosPicker` (shows full camera roll) with custom `LimitedPhotoPickerView`
+- [x] Custom picker uses `PHPhotoLibrary`/`PHAsset.fetchAssets` which respects Limited Access
+- [x] "Manage Access" button via `presentLimitedLibraryPicker(from:)` (Instagram-style)
+- [x] Banner: "Showing only photos you've granted access to" in limited mode
+- [x] Empty state with guidance when no authorized photos available
+
+#### 7.4 Build Warning Fixes ✅
+- [x] Fix Swift concurrency warnings in `AppState.saveScannedPhotoIds()` (capture keys before Task.detached)
+- [x] Fix `AuthService` timer closure concurrency warning (`[weak self]` on Task)
+- [x] Fix unused `remaining` variable in `LockScreenView.wipeWarningBanner`
+
+### Deliverables
+- ✅ Anonymous beta analytics answering: scan frequency, vault volume, friction points
+- ✅ Manual photo picker respects Limited Photo Access permissions
+- ✅ Clean build with zero errors and zero warnings
+- ✅ TelemetryDeck dashboard receiving signals
+
+### Privacy Guarantees
+- **Tracked**: event names, counts, durations, success/failure, feature toggles
+- **Never tracked**: photo content, filenames, patient data, user identifiers
+- TelemetryDeck auto-hashes device IDs — no PII transmitted
+
+---
+
+## 11. Future Enhancements (Post-MVP)
+
+### 11.1 Batch Scanning Enhancements
 - [x] Remember scan progress across sessions ✅ (Implemented Feb 2026)
 - [ ] "Scan Next 1000" functionality
 - [ ] Date range picker for targeted scanning
 - [ ] Progress tracker showing library coverage
 
-### 10.2 Background Scanning
+### 11.2 Background Scanning
 - [ ] Implement BGProcessingTask
 - [ ] Schedule periodic scans
 - [ ] Local notification when photos found
 - [ ] Battery-efficient implementation
 
-### 10.3 Manual Photo Addition
+### 11.3 Manual Photo Addition
 - [x] Photo picker for manual vault addition ✅ (Implemented March 2026)
 - [x] Encrypt and remove from camera roll ✅
 - [ ] "Add to Vault" option in review screen
 
-### 10.4 Export & Sharing
+### 11.4 Export & Sharing
 - [x] Export single photo (decrypted) ✅
 - [x] Share via AirDrop ✅
 - [x] Share via iOS Share Sheet ✅
 - [x] Restore photos to camera roll ✅ (Implemented Feb 2026)
 - [ ] Audit log for exports
 
-### 10.5 Organization Features
+### 11.5 Organization Features
 - [ ] Create folders/albums in vault
 - [ ] Tag photos
 - [ ] Search by date
 - [ ] Sort options
 
-### 10.6 Cloud Backup (Requires BAA)
+### 11.6 Cloud Backup (Requires BAA)
 - [ ] End-to-end encrypted backup
 - [ ] iCloud or custom server
 - [ ] Restore to new device
 - [ ] HIPAA BAA with provider
 
-### 10.7 Model Improvement
+### 11.7 Model Improvement
 - [ ] Collect user corrections (false positives/negatives)
 - [ ] Retrain model periodically
 - [ ] Improve accuracy over time
 
 ---
 
-## 11. Development Notes
+## 12. Development Notes
 
 ### Key Technical Decisions
 
@@ -465,7 +513,7 @@ Without a paid developer account:
 
 ---
 
-## 12. Success Criteria
+## 13. Success Criteria
 
 ### MVP Complete ✅
 
@@ -491,3 +539,5 @@ Without a paid developer account:
 - [x] Scan reminders ✅
 - [x] Auto-wipe data protection ✅
 - [x] Session lock management ✅
+- [x] Anonymous beta analytics (TelemetryDeck) ✅
+- [x] Limited Photo Access compliance ✅
