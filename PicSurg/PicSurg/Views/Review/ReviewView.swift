@@ -85,7 +85,13 @@ struct ReviewView: View {
                     }
 
                     HStack(spacing: 15) {
-                        Button(action: { onComplete() }) {
+                        Button(action: {
+                            AnalyticsService.shared.track(.reviewCancelled, parameters: [
+                                "photosAvailable": String(results.count),
+                                "photosSelected": String(selectedCount)
+                            ])
+                            onComplete()
+                        }) {
                             Text("Cancel")
                                 .font(.headline)
                                 .foregroundColor(.primary)
@@ -113,6 +119,9 @@ struct ReviewView: View {
         .navigationTitle("Review")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
+            AnalyticsService.shared.track(.reviewOpened, parameters: [
+                "photosToReview": String(results.count)
+            ])
             validateAndLoadThumbnails()
         }
         .onChange(of: photoService.libraryChangeCount) { _ in
@@ -303,6 +312,17 @@ struct ReviewView: View {
                 // Log activity
                 if securedCount > 0 {
                     appState.logActivity(.secured, count: securedCount)
+
+                    let approvalRate = Float(securedCount) / max(Float(selectedResults.count), 1)
+                    AnalyticsService.shared.track(.reviewCompleted, parameters: [
+                        "photosApproved": String(securedCount),
+                        "photosAvailable": String(selectedResults.count),
+                        "approvalRate": String(format: "%.2f", approvalRate)
+                    ])
+                    AnalyticsService.shared.track(.photosVaulted, parameters: [
+                        "count": String(securedCount),
+                        "source": "scan"
+                    ])
                 }
 
                 if localFailedCount > 0 || deleteWarning {

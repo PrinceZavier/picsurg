@@ -637,7 +637,7 @@ final class AuthService: ObservableObject {
         let timeout = TimeInterval(inactivityTimeout.rawValue)
 
         inactivityTimer = Timer.scheduledTimer(withTimeInterval: timeout, repeats: false) { [weak self] _ in
-            Task { @MainActor in
+            Task { @MainActor [weak self] in
                 // Don't lock while a scan is in progress
                 guard !AppState.shared.isScanning else {
                     self?.resetInactivityTimer()

@@ -114,6 +114,7 @@ struct VaultView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                AnalyticsService.shared.track(.vaultViewed)
                 loadPhotos()
             }
             .sheet(item: $selectedPhoto) { photo in
@@ -376,6 +377,7 @@ struct VaultView: View {
 
             // Log activity
             appState.logActivity(.deleted, count: 1)
+            AnalyticsService.shared.track(.photoDeleted, parameters: ["count": "1"])
         } catch {
             Haptics.error()
             errorMessage = "Could not delete the photo. Please try again."
@@ -407,6 +409,7 @@ struct VaultView: View {
         // Log activity
         if deletedCount > 0 {
             appState.logActivity(.deleted, count: deletedCount)
+            AnalyticsService.shared.track(.photoDeleted, parameters: ["count": String(deletedCount)])
         }
 
         withAnimation {
@@ -449,6 +452,7 @@ struct VaultView: View {
                     showingError = true
                 } else {
                     appState.logActivity(.shared, count: urls.count)
+                    AnalyticsService.shared.track(.photoShared, parameters: ["count": String(urls.count)])
                     presentShareSheet(items: urls) {
                         // Clean up temp files after share completes
                         for url in urls {
@@ -510,6 +514,10 @@ struct VaultView: View {
                 if successCount > 0 {
                     Haptics.success()
                     appState.logActivity(.secured, count: successCount)
+                    AnalyticsService.shared.track(.photosVaulted, parameters: [
+                        "count": String(successCount),
+                        "source": "manual"
+                    ])
                     addedPhotosCount = successCount
                     showingAddSuccess = true
                     loadPhotos()
@@ -750,6 +758,7 @@ struct SecurePhotoView: View {
                     Haptics.success()
                     showingRestoreSuccess = true
                     appState.logActivity(.restored, count: 1)
+                    AnalyticsService.shared.track(.photoRestored)
                     onRestore?()
                 }
             } catch {

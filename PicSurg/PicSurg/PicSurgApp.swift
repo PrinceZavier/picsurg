@@ -12,6 +12,10 @@ struct PicSurgApp: App {
     @StateObject private var appState = AppState.shared
     @StateObject private var authService = AuthService.shared
 
+    init() {
+        AnalyticsService.shared.initialize()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()
@@ -29,6 +33,7 @@ struct PicSurgApp: App {
                     if authService.isAuthenticated {
                         authService.resetInactivityTimer()
                     }
+                    AnalyticsService.shared.trackAppOpened()
                 }
         }
     }

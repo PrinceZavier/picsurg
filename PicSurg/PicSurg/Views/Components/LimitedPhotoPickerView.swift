@@ -1,5 +1,6 @@
 import SwiftUI
 import Photos
+import PhotosUI
 
 /// Custom photo picker that respects Limited Photo Library access.
 /// Unlike the system PhotosPicker (PHPickerViewController), this only shows
@@ -211,11 +212,15 @@ struct LimitedPhotoPickerView: View {
     }
 
     private func presentLimitedLibraryPicker() {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
-        PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: windowScene) { _ in
-            // Reload after user changes their selection
-            Task { @MainActor in
-                loadAuthorizedPhotos()
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first?.rootViewController else { return }
+        var topVC = rootVC
+        while let presented = topVC.presentedViewController {
+            topVC = presented
+        }
+        PHPhotoLibrary.shared().presentLimitedLibraryPicker(from: topVC) { _ in
+            DispatchQueue.main.async {
+                self.loadAuthorizedPhotos()
             }
         }
     }

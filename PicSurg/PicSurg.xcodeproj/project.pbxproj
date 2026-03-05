@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4FE4EBED2F59E2D9008DF566 /* TelemetryClient in Frameworks */ = {isa = PBXBuildFile; productRef = 4FE4EBEC2F59E2D9008DF566 /* TelemetryClient */; };
+		4FE4EBEF2F59E2D9008DF566 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = 4FE4EBEE2F59E2D9008DF566 /* TelemetryDeck */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4F97841D2F088A3600B18BA2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FE4EBED2F59E2D9008DF566 /* TelemetryClient in Frameworks */,
+				4FE4EBEF2F59E2D9008DF566 /* TelemetryDeck in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +132,8 @@
 			);
 			name = PicSurg;
 			packageProductDependencies = (
+				4FE4EBEC2F59E2D9008DF566 /* TelemetryClient */,
+				4FE4EBEE2F59E2D9008DF566 /* TelemetryDeck */,
 			);
 			productName = PicSurg;
 			productReference = 4F97840F2F088A3400B18BA2 /* PicSurg.app */;
@@ -208,6 +217,9 @@
 			);
 			mainGroup = 4F9784062F088A3400B18BA2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4FE4EBEB2F59E2D9008DF566 /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4F9784102F088A3400B18BA2 /* Products */;
 			projectDirPath = "";
@@ -595,6 +607,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4FE4EBEB2F59E2D9008DF566 /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4FE4EBEC2F59E2D9008DF566 /* TelemetryClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FE4EBEB2F59E2D9008DF566 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryClient;
+		};
+		4FE4EBEE2F59E2D9008DF566 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FE4EBEB2F59E2D9008DF566 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4F9784072F088A3400B18BA2 /* Project object */;
 }

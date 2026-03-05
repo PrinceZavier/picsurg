@@ -243,9 +243,11 @@ final class AppState: ObservableObject {
         // Save on a background thread to avoid blocking UI with large arrays
         let ids = Array(scannedPhotoIds)
         let count = totalPhotosScanned
+        let idsKey = Self.scannedPhotoIdsKey
+        let countKey = Self.totalScannedKey
         Task.detached(priority: .utility) {
-            UserDefaults.standard.set(ids, forKey: AppState.scannedPhotoIdsKey)
-            UserDefaults.standard.set(count, forKey: AppState.totalScannedKey)
+            UserDefaults.standard.set(ids, forKey: idsKey)
+            UserDefaults.standard.set(count, forKey: countKey)
         }
     }
 

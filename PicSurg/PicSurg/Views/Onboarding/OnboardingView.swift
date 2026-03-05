@@ -118,6 +118,11 @@ struct OnboardingView: View {
     private func completeOnboarding() {
         appState.setOnboardingComplete()
         authService.unlock()
+
+        AnalyticsService.shared.track(.onboardingCompleted, parameters: [
+            "biometricEnabled": String(authService.isBiometricEnabled),
+            "remindersEnabled": String(ReminderService.shared.isEnabled)
+        ])
     }
 }
 

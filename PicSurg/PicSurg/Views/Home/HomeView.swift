@@ -155,6 +155,7 @@ struct HomeView: View {
     @State private var addedPhotosCount = 0
     @State private var showingAddSuccess = false
     @State private var showingRescanPrompt = false
+    @State private var scanStartTime: Date?
 
     private let batchSize = 100
 
@@ -199,6 +200,7 @@ struct HomeView: View {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Menu {
                         Button {
+                            AnalyticsService.shared.track(.manualAddOpened)
                             showingPhotoPicker = true
                         } label: {
                             Label("Add Photos Manually", systemImage: "plus.circle")
@@ -427,6 +429,10 @@ struct HomeView: View {
                 if successCount > 0 {
                     Haptics.success()
                     appState.logActivity(.secured, count: successCount)
+                    AnalyticsService.shared.track(.photosVaulted, parameters: [
+                        "count": String(successCount),
+                        "source": "manual"
+                    ])
                     addedPhotosCount = successCount
                     showingAddSuccess = true
                 } else {
@@ -450,6 +456,7 @@ struct HomeView: View {
         surgicalPhotosFound = 0
         currentBatchNumber = 0
         totalBatches = 0
+        scanStartTime = Date()
 
         // Get already-secured asset IDs to skip during scan
         let securedAssetIds = VaultService.shared.getSecuredAssetIds()
@@ -471,6 +478,11 @@ struct HomeView: View {
         let assetsToScan = unsecuredAssets.filter { unscannedIds.contains($0.localIdentifier) }
 
         print("📷 Total library: \(allAssets.count), Unsecured: \(unsecuredAssets.count), Unscanned: \(assetsToScan.count)")
+
+        AnalyticsService.shared.track(.scanInitiated, parameters: [
+            "isInitialScan": String(!appState.hasCompletedInitialScan),
+            "totalPhotos": String(assetsToScan.count)
+        ])
 
         guard !assetsToScan.isEmpty else {
             await MainActor.run {
@@ -563,6 +575,14 @@ struct HomeView: View {
 
             // Log activity
             appState.logActivity(.scanned, count: totalPhotos)
+
+            // Track scan completion
+            let duration = scanStartTime.map { Int(Date().timeIntervalSince($0)) } ?? 0
+            AnalyticsService.shared.track(.scanCompleted, parameters: [
+                "photosScanned": String(totalPhotos),
+                "surgicalFound": String(allResults.count),
+                "durationSeconds": String(duration)
+            ])
 
             if !allResults.isEmpty {
                 Haptics.success()

@@ -88,6 +88,9 @@ struct SettingsView: View {
                 Button("Cancel", role: .cancel) {}
                 Button("Enable", role: .destructive) {
                     authService.isAutoWipeEnabled = true
+                    AnalyticsService.shared.track(.settingsChanged, parameters: [
+                        "setting": "autoWipe", "value": "true"
+                    ])
                 }
             } message: {
                 Text("When enabled, all vault photos, encryption keys, and app data will be permanently erased after too many failed PIN attempts.\n\nMake sure you have a recovery email set up in case you forget your PIN.")
@@ -107,7 +110,12 @@ struct SettingsView: View {
             if authService.isBiometricAvailable {
                 Toggle(isOn: Binding(
                     get: { authService.isBiometricEnabled },
-                    set: { authService.isBiometricEnabled = $0 }
+                    set: {
+                        authService.isBiometricEnabled = $0
+                        AnalyticsService.shared.track(.settingsChanged, parameters: [
+                            "setting": "biometric", "value": String($0)
+                        ])
+                    }
                 )) {
                     Label(authService.biometricName, systemImage: authService.biometricType == .faceID ? "faceid" : "touchid")
                 }
@@ -128,6 +136,9 @@ struct SettingsView: View {
                             showingAutoWipeConfirm = true
                         } else {
                             authService.isAutoWipeEnabled = false
+                            AnalyticsService.shared.track(.settingsChanged, parameters: [
+                                "setting": "autoWipe", "value": "false"
+                            ])
                         }
                     }
                 )) {
@@ -170,7 +181,12 @@ struct SettingsView: View {
         Section {
             Picker(selection: Binding(
                 get: { authService.gracePeriod },
-                set: { authService.gracePeriod = $0 }
+                set: {
+                    authService.gracePeriod = $0
+                    AnalyticsService.shared.track(.settingsChanged, parameters: [
+                        "setting": "gracePeriod", "value": $0.displayName
+                    ])
+                }
             )) {
                 ForEach(AuthService.GracePeriod.allCases) { period in
                     Text(period.displayName).tag(period)
@@ -181,7 +197,12 @@ struct SettingsView: View {
 
             Picker(selection: Binding(
                 get: { authService.inactivityTimeout },
-                set: { authService.inactivityTimeout = $0 }
+                set: {
+                    authService.inactivityTimeout = $0
+                    AnalyticsService.shared.track(.settingsChanged, parameters: [
+                        "setting": "inactivityTimeout", "value": $0.displayName
+                    ])
+                }
             )) {
                 ForEach(AuthService.InactivityTimeout.allCases) { timeout in
                     Text(timeout.displayName).tag(timeout)
@@ -232,12 +253,18 @@ struct SettingsView: View {
                                 }
                             } else if status == .authorized || status == .provisional {
                                 reminderService.isEnabled = true
+                                AnalyticsService.shared.track(.settingsChanged, parameters: [
+                                    "setting": "reminders", "value": "true"
+                                ])
                             } else {
                                 showingNotificationPermission = true
                             }
                         }
                     } else {
                         reminderService.isEnabled = false
+                        AnalyticsService.shared.track(.settingsChanged, parameters: [
+                            "setting": "reminders", "value": "false"
+                        ])
                     }
                 }
             )) {

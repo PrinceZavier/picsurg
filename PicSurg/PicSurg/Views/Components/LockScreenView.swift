@@ -206,7 +206,7 @@ struct LockScreenView: View {
                 .cornerRadius(10)
                 .padding(.horizontal)
 
-            case .critical(let remaining):
+            case .critical(_):
                 VStack(spacing: 6) {
                     HStack {
                         Image(systemName: "trash.circle.fill")
@@ -248,7 +248,12 @@ struct LockScreenView: View {
     }
 
     private func verifyPIN() {
-        if authService.verifyPIN(pin) {
+        let success = authService.verifyPIN(pin)
+        AnalyticsService.shared.track(.authAttempt, parameters: [
+            "method": "pin", "success": String(success)
+        ])
+
+        if success {
             // Success - authService.unlock() is called in verifyPIN
             pin = ""
             lockoutTimer?.invalidate()
@@ -314,6 +319,10 @@ struct LockScreenView: View {
 
         Task {
             let success = await authService.authenticateWithBiometric()
+            AnalyticsService.shared.track(.authAttempt, parameters: [
+                "method": authService.biometricType == .faceID ? "faceID" : "touchID",
+                "success": String(success)
+            ])
             await MainActor.run {
                 isAuthenticating = false
                 if !success && !authService.isAuthenticated {
