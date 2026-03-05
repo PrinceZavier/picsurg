@@ -17,8 +17,8 @@ const sections = [
     items: [
       "All photo analysis happens entirely on your device using Apple's Core ML framework",
       "No images are ever sent to external servers or cloud services",
-      "The trained ML model runs locally — no internet connection required",
-      "Photo classification takes approximately 50ms per image on modern iPhones",
+      "The ML model runs locally — no internet connection required for scanning",
+      "Photo classification takes milliseconds per image on modern iPhones",
     ],
   },
   {
@@ -30,9 +30,8 @@ const sections = [
     ),
     items: [
       "Every photo is individually encrypted using AES-256-GCM — the same standard used by governments and financial institutions",
-      "A unique random 96-bit nonce is generated for each encryption operation",
-      "Encryption keys are generated on first launch and stored securely in the iOS Keychain",
-      "Keys are protected with WhenUnlockedThisDeviceOnly access control — they never leave your device",
+      "Encryption keys are securely stored in the iOS Keychain and never leave your device",
+      "Each encryption operation uses a unique random value, so no two encrypted files are alike",
     ],
   },
   {
@@ -46,8 +45,7 @@ const sections = [
       "Face ID and Touch ID provide fast, secure biometric authentication",
       "6-digit PIN serves as a fallback when biometrics are unavailable",
       "The app automatically locks when backgrounded — every session requires fresh authentication",
-      "Failed attempt protection with exponential lockout (1 min, 5 min, 15 min, 1 hour)",
-      "PIN recovery available via verified email with time-limited codes",
+      "Built-in lockout and recovery features protect against unauthorized access attempts",
     ],
   },
   {
@@ -58,12 +56,11 @@ const sections = [
       </svg>
     ),
     items: [
-      "All photos stay on your device — PicSurg has no servers and no cloud storage for your images",
-      "Anonymous usage analytics help us improve the app — no photos, names, or identifiable data are ever sent",
-      "Vault directory is excluded from iCloud and iTunes backups by default",
-      "Photos are only deleted from your camera roll after successful vault encryption",
-      "You can restore photos to your camera roll or share via AirDrop at any time",
+      "Photos never leave your device — no servers, no cloud storage",
+      "Vault is excluded from iCloud and iTunes backups by default",
+      "Restore photos to your camera roll or share securely at any time",
       "Full data deletion available in Settings — wipe everything with one tap",
+      "Anonymous usage analytics help us improve the app — no photos or identifiable data are ever sent",
     ],
   },
   {
@@ -75,10 +72,10 @@ const sections = [
     ),
     items: [
       "Designed to support HIPAA Security Rule requirements for Protected Health Information (PHI)",
-      "No PHI is ever transmitted — photos and patient data never leave your device",
-      "Access controls ensure only authenticated users can view secured photos",
-      "Activity logging tracks scan, secure, delete, share, and restore operations",
-      "Minimal third-party dependencies — core functionality built entirely on Apple first-party frameworks",
+      "No PHI is ever transmitted — patient photos and data stay on your device",
+      "Authentication and access controls protect every session",
+      "Activity logging tracks key operations for accountability",
+      "Built primarily on Apple first-party frameworks for security and reliability",
     ],
   },
 ];
