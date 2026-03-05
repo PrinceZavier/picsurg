@@ -170,7 +170,7 @@ export default function SecurityPage() {
                 <li><strong className="text-white">Authentication data:</strong> Your PIN hash, biometric enrollment preferences, and optional recovery email are stored in the iOS Keychain on your device.</li>
                 <li><strong className="text-white">App preferences:</strong> Settings such as scan history and onboarding status are stored locally using iOS UserDefaults.</li>
               </ul>
-              <p className="mt-3">The App also sends anonymous usage analytics to TelemetryDeck to help us improve the product:</p>
+              <p className="mt-3">The App also sends anonymous usage analytics to help us improve the product:</p>
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li><strong className="text-white">Anonymous analytics:</strong> Feature usage counts (e.g. number of scans, photos secured), durations, and success/failure status. No photos, filenames, patient data, or personally identifiable information is ever included.</li>
               </ul>
