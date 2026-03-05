@@ -58,7 +58,8 @@ const sections = [
       </svg>
     ),
     items: [
-      "All data stays on your device — PicSurg has no servers, no cloud storage, no analytics",
+      "All photos stay on your device — PicSurg has no servers and no cloud storage for your images",
+      "Anonymous usage analytics help us improve the app — no photos, names, or identifiable data are ever sent",
       "Vault directory is excluded from iCloud and iTunes backups by default",
       "Photos are only deleted from your camera roll after successful vault encryption",
       "You can restore photos to your camera roll or share via AirDrop at any time",
@@ -74,10 +75,10 @@ const sections = [
     ),
     items: [
       "Designed to support HIPAA Security Rule requirements for Protected Health Information (PHI)",
-      "No data transmission eliminates network-based attack vectors entirely",
+      "No PHI is ever transmitted — photos and patient data never leave your device",
       "Access controls ensure only authenticated users can view secured photos",
       "Activity logging tracks scan, secure, delete, share, and restore operations",
-      "Zero third-party dependencies — built entirely on Apple's first-party frameworks",
+      "Minimal third-party dependencies — core functionality built entirely on Apple first-party frameworks",
     ],
   },
 ];
@@ -144,7 +145,7 @@ export default function SecurityPage() {
 
         {/* Privacy Policy */}
         <section id="privacy" className="mb-20 scroll-mt-24">
-          <p className="mb-2 text-sm text-gray-500">Last updated: February 2026</p>
+          <p className="mb-2 text-sm text-gray-500">Last updated: March 2026</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Privacy Policy</h2>
 
           <div className="space-y-8 text-gray-300 leading-relaxed">
@@ -161,7 +162,7 @@ export default function SecurityPage() {
             <div>
               <h3 className="mb-3 text-xl font-semibold text-white">2. Information We Collect</h3>
               <p className="mb-3">
-                <strong className="text-white">We do not collect, transmit, or store any personal data on external servers.</strong>
+                <strong className="text-white">We do not collect, transmit, or store any photos or personal health data on external servers.</strong>
               </p>
               <p className="mb-3">The App processes the following data locally on your device:</p>
               <ul className="list-disc space-y-2 pl-6">
@@ -169,24 +170,30 @@ export default function SecurityPage() {
                 <li><strong className="text-white">Authentication data:</strong> Your PIN hash, biometric enrollment preferences, and optional recovery email are stored in the iOS Keychain on your device.</li>
                 <li><strong className="text-white">App preferences:</strong> Settings such as scan history and onboarding status are stored locally using iOS UserDefaults.</li>
               </ul>
+              <p className="mt-3">The App also sends anonymous usage analytics to TelemetryDeck to help us improve the product:</p>
+              <ul className="mt-3 list-disc space-y-2 pl-6">
+                <li><strong className="text-white">Anonymous analytics:</strong> Feature usage counts (e.g. number of scans, photos secured), durations, and success/failure status. No photos, filenames, patient data, or personally identifiable information is ever included.</li>
+              </ul>
             </div>
 
             <div>
               <h3 className="mb-3 text-xl font-semibold text-white">3. How We Use Your Information</h3>
-              <p>All data processing occurs on-device for the sole purpose of:</p>
+              <p>All photo processing occurs on-device. Your data is used for:</p>
               <ul className="mt-3 list-disc space-y-2 pl-6">
                 <li>Classifying photos as surgical or non-surgical using the on-device ML model</li>
                 <li>Encrypting and securely storing selected photos in your local vault</li>
                 <li>Authenticating you via Face ID, Touch ID, or PIN</li>
+                <li>Sending anonymous usage analytics to improve the app (no photos or personal data included)</li>
               </ul>
             </div>
 
             <div>
               <h3 className="mb-3 text-xl font-semibold text-white">4. Data Sharing</h3>
               <p>
-                We do not share, sell, or transmit any of your data to third parties.
-                PicSurg has no servers, no analytics services, and no third-party SDKs.
-                The App operates entirely offline.
+                We do not share, sell, or transmit any photos or personal health data to
+                third parties. The App sends anonymous usage analytics (e.g. feature usage
+                counts, scan durations) to help us improve the product. This data contains
+                no photos, patient information, or personally identifiable information.
               </p>
             </div>
 
@@ -206,10 +213,11 @@ export default function SecurityPage() {
               <h3 className="mb-3 text-xl font-semibold text-white">6. HIPAA Considerations</h3>
               <p>
                 PicSurg is designed to support HIPAA Security Rule requirements for
-                handling Protected Health Information (PHI). Since all data remains on
-                your device with no external transmission, the App minimizes the risk of
-                unauthorized access or data breaches. Healthcare providers should consult
-                their compliance officers regarding institutional policies.
+                handling Protected Health Information (PHI). All photos and health-related
+                data remain on your device and are never transmitted externally. The only
+                network activity is anonymous usage analytics, which contains no PHI.
+                Healthcare providers should consult their compliance officers regarding
+                institutional policies.
               </p>
             </div>
 
@@ -258,7 +266,7 @@ export default function SecurityPage() {
 
         {/* Terms of Service */}
         <section id="terms" className="scroll-mt-24">
-          <p className="mb-2 text-sm text-gray-500">Last updated: February 2026</p>
+          <p className="mb-2 text-sm text-gray-500">Last updated: March 2026</p>
           <h2 className="mb-8 text-3xl font-bold text-white">Terms of Service</h2>
 
           <div className="space-y-8 text-gray-300 leading-relaxed">

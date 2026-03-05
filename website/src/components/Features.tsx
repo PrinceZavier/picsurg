@@ -33,7 +33,7 @@ const features = [
       </svg>
     ),
     title: "HIPAA-Compliant Design",
-    description: "Built with healthcare privacy in mind. On-device processing, no cloud uploads, backup exclusion.",
+    description: "Built with healthcare privacy in mind. On-device processing, no photo uploads, backup exclusion.",
   },
 ];
 
