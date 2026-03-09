@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PicSurg | Secure Your Surgical Photos",
   description:
-    "PicSurg uses machine learning to automatically detect surgical photos in your camera roll and store them in a HIPAA-compliant encrypted vault.",
-  keywords: ["surgical photos", "HIPAA", "medical", "encryption", "iOS", "machine learning"],
+    "PicSurg uses machine learning to automatically detect surgical photos in your camera roll and store them in a secure encrypted vault.",
+  keywords: ["surgical photos", "medical privacy", "medical", "encryption", "iOS", "machine learning"],
 };
 
 export default function RootLayout({

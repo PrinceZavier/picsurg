@@ -30,7 +30,7 @@ export default function AboutPage() {
             photos daily for documentation, education, and patient care, but these
             sensitive images sit alongside personal memories with no separation or
             protection. PicSurg uses machine learning to automatically detect surgical
-            photos and secure them in a HIPAA-compliant encrypted vault, giving
+            photos and secure them in an encrypted vault, giving
             healthcare professionals peace of mind.
           </p>
         </div>

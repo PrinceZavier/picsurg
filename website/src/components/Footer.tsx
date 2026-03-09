@@ -8,7 +8,7 @@ export default function Footer() {
           <div>
             <h3 className="mb-3 text-lg font-bold text-white">PicSurg</h3>
             <p className="text-sm text-gray-400">
-              ML-powered surgical photo detection with HIPAA-compliant encrypted storage.
+              ML-powered surgical photo detection with privacy-aware encrypted storage.
             </p>
           </div>
           <div>

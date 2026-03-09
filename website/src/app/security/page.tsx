@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Security & Legal | PicSurg",
-  description: "How PicSurg protects your surgical photos with AES-256 encryption, biometric authentication, and HIPAA-compliant design. Plus our Privacy Policy and Terms of Service.",
+  description: "How PicSurg protects your surgical photos with AES-256 encryption, biometric authentication, and privacy-aware design. Plus our Privacy Policy and Terms of Service.",
 };
 
 const sections = [
@@ -60,14 +60,14 @@ const sections = [
     ],
   },
   {
-    title: "HIPAA-Compliant Design",
+    title: "Privacy-Aware Design",
     icon: (
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
       </svg>
     ),
     items: [
-      "Designed to support HIPAA Security Rule requirements for Protected Health Information (PHI)",
+      "Designed with healthcare data privacy as a core principle",
       "No PHI is ever transmitted. Patient photos and data stay on your device",
       "Built primarily on Apple first-party frameworks for security and reliability",
     ],
@@ -201,14 +201,15 @@ export default function SecurityPage() {
             </div>
 
             <div>
-              <h3 className="mb-3 text-xl font-semibold text-white">6. HIPAA Considerations</h3>
+              <h3 className="mb-3 text-xl font-semibold text-white">6. Healthcare Privacy</h3>
               <p>
-                PicSurg is designed to support HIPAA Security Rule requirements for
-                handling Protected Health Information (PHI). All photos and health-related
-                data remain on your device and are never transmitted externally. The only
-                network activity is anonymous usage analytics, which contains no PHI.
-                Healthcare providers should consult their compliance officers regarding
-                institutional policies.
+                PicSurg is a photo management tool designed with healthcare data privacy
+                in mind. All photos and health-related data remain on your device and are
+                never transmitted externally. The only network activity is anonymous usage
+                analytics, which contains no patient data. PicSurg is not itself a
+                regulatory compliance solution. Healthcare providers are responsible for
+                ensuring their own compliance and should consult their compliance officers
+                regarding institutional policies.
               </p>
             </div>
 
