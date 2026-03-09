@@ -17,7 +17,6 @@ const sections = [
     items: [
       "All photo analysis happens entirely on your device. No images are ever sent externally",
       "The ML model runs locally with no internet connection required",
-      "Photo classification takes milliseconds per image on modern iPhones",
     ],
   },
   {
@@ -30,7 +29,6 @@ const sections = [
     items: [
       "Every photo is individually encrypted using AES-256-GCM, the same standard used by governments and financial institutions",
       "Encryption keys are securely stored in the iOS Keychain and never leave your device",
-      "Each encryption operation uses a unique random value, so no two encrypted files are alike",
     ],
   },
   {
@@ -43,7 +41,6 @@ const sections = [
     items: [
       "Face ID and Touch ID with a 6-digit PIN fallback",
       "Auto-locks when backgrounded, requiring fresh authentication every session",
-      "Built-in lockout and recovery features protect against unauthorized access",
     ],
   },
   {
@@ -56,7 +53,6 @@ const sections = [
     items: [
       "Photos never leave your device. No servers, no cloud storage",
       "Vault excluded from iCloud and iTunes backups by default",
-      "Anonymous usage analytics contain no photos or identifiable data",
     ],
   },
   {
@@ -68,7 +64,6 @@ const sections = [
     ),
     items: [
       "Designed with healthcare data privacy as a core principle",
-      "No PHI is ever transmitted. Patient photos and data stay on your device",
       "Built primarily on Apple first-party frameworks for security and reliability",
     ],
   },
