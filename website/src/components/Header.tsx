@@ -20,9 +20,6 @@ export default function Header() {
           <Link href="/" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
             Home
           </Link>
-          <Link href="/about" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
-            About
-          </Link>
           <Link href="/security" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
             Security & Legal
           </Link>
@@ -52,9 +49,6 @@ export default function Header() {
           <div className="flex flex-col gap-4 px-6 py-6">
             <Link href="/" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
               Home
-            </Link>
-            <Link href="/about" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
-              About
             </Link>
             <Link href="/security" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
               Security & Legal
