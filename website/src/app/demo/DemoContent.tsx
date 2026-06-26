@@ -57,7 +57,7 @@ export default function DemoContent() {
             aria-hidden
           >
             <p
-              className="whitespace-nowrap text-[10px] font-semibold tracking-[0.2em] text-foreground"
+              className="whitespace-nowrap text-[8px] font-semibold tracking-[0.15em] text-foreground"
               style={{ opacity: 0.18 }}
             >
               CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG
