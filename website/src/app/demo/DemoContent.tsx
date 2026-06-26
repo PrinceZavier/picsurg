@@ -52,7 +52,8 @@ export default function DemoContent() {
 
           {/* Watermark overlay */}
           <div
-            className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+            className="pointer-events-none absolute inset-0 flex justify-center select-none"
+            style={{ paddingTop: "12%" }}
             aria-hidden
           >
             <p
