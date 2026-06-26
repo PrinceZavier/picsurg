@@ -46,14 +46,14 @@ export default function Hero() {
           </div>
         </div>
 
-        <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-white md:text-7xl">
+        <h1 className="mb-6 text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl">
           Your surgical photos,{" "}
           <span className="bg-gradient-to-r from-teal to-cyan bg-clip-text text-transparent">
             secured automatically
           </span>
         </h1>
 
-        <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-400 md:text-xl">
+        <p className="mx-auto mb-10 max-w-2xl text-lg text-slate-500 md:text-xl">
           PicSurg uses machine learning to detect operative photos in your camera roll
           and locks them in a secure encrypted vault, so your personal and
           professional photos stay separate.
@@ -68,13 +68,13 @@ export default function Hero() {
           </Link>
           <Link
             href="/security"
-            className="rounded-full border border-white/20 px-8 py-3.5 text-lg font-semibold text-white transition-colors hover:border-teal hover:text-teal-light"
+            className="rounded-full border border-foreground/20 px-8 py-3.5 text-lg font-semibold text-foreground transition-colors hover:border-teal hover:text-teal"
           >
             How It&apos;s Secured
           </Link>
         </div>
 
-        <p className="mt-8 text-sm text-gray-500">
+        <p className="mt-8 text-sm text-slate-400">
           Coming soon to the App Store &middot; iOS 16+
         </p>
       </div>

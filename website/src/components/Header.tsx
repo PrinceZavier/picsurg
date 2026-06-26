@@ -8,19 +8,19 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-md">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-foreground/10 bg-background/80 backdrop-blur-md">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/icon.png" alt="PicSurg" width={36} height={36} className="rounded-lg" />
-          <span className="text-xl font-bold text-white">PicSurg</span>
+          <span className="text-xl font-bold text-foreground">PicSurg</span>
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-8 md:flex">
-          <Link href="/" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
+          <Link href="/" className="text-sm text-slate-600 transition-colors hover:text-teal">
             Home
           </Link>
-          <Link href="/security" className="text-sm text-gray-300 transition-colors hover:text-teal-light">
+          <Link href="/security" className="text-sm text-slate-600 transition-colors hover:text-teal">
             Security & Legal
           </Link>
           <Link
@@ -37,20 +37,20 @@ export default function Header() {
           className="flex flex-col gap-1.5 md:hidden"
           aria-label="Toggle menu"
         >
-          <span className={`h-0.5 w-6 bg-white transition-transform ${menuOpen ? "translate-y-2 rotate-45" : ""}`} />
-          <span className={`h-0.5 w-6 bg-white transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-          <span className={`h-0.5 w-6 bg-white transition-transform ${menuOpen ? "-translate-y-2 -rotate-45" : ""}`} />
+          <span className={`h-0.5 w-6 bg-foreground transition-transform ${menuOpen ? "translate-y-2 rotate-45" : ""}`} />
+          <span className={`h-0.5 w-6 bg-foreground transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
+          <span className={`h-0.5 w-6 bg-foreground transition-transform ${menuOpen ? "-translate-y-2 -rotate-45" : ""}`} />
         </button>
       </nav>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="border-t border-white/10 bg-background/95 backdrop-blur-md md:hidden">
+        <div className="border-t border-foreground/10 bg-background/95 backdrop-blur-md md:hidden">
           <div className="flex flex-col gap-4 px-6 py-6">
-            <Link href="/" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
+            <Link href="/" onClick={() => setMenuOpen(false)} className="text-slate-600 hover:text-teal">
               Home
             </Link>
-            <Link href="/security" onClick={() => setMenuOpen(false)} className="text-gray-300 hover:text-teal-light">
+            <Link href="/security" onClick={() => setMenuOpen(false)} className="text-slate-600 hover:text-teal">
               Security & Legal
             </Link>
             <Link

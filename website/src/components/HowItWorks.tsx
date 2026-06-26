@@ -21,10 +21,10 @@ export default function HowItWorks() {
     <section className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
             How it works
           </h2>
-          <p className="mx-auto max-w-2xl text-gray-400">
+          <p className="mx-auto max-w-2xl text-slate-500">
             Three simple steps to separate your surgical photos from your personal library.
           </p>
         </div>
@@ -36,11 +36,11 @@ export default function HowItWorks() {
               {index < steps.length - 1 && (
                 <div className="absolute top-10 left-[60%] hidden h-0.5 w-[80%] bg-gradient-to-r from-teal/50 to-transparent md:block" />
               )}
-              <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-teal to-cyan text-2xl font-bold text-white">
+              <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-teal to-cyan text-2xl font-bold text-foreground">
                 {step.number}
               </div>
-              <h3 className="mb-3 text-xl font-semibold text-white">{step.title}</h3>
-              <p className="text-gray-400">{step.description}</p>
+              <h3 className="mb-3 text-xl font-semibold text-foreground">{step.title}</h3>
+              <p className="text-slate-500">{step.description}</p>
             </div>
           ))}
         </div>

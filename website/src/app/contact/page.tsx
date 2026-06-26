@@ -37,17 +37,17 @@ export default function ContactPage() {
   }
 
   const selectClasses =
-    "w-full appearance-none rounded-xl border border-white/10 bg-navy px-4 py-3 text-white outline-none transition-colors focus:border-teal";
+    "w-full appearance-none rounded-xl border border-foreground/10 bg-white px-4 py-3 text-foreground outline-none transition-colors focus:border-teal";
 
   return (
     <div className="px-6 pt-32 pb-24">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-16 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-white md:text-5xl">
+          <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">
             Join the PicSurg Beta
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-gray-400">
+          <p className="mx-auto max-w-2xl text-lg text-slate-500">
             Get free early access to PicSurg in exchange for your feedback.
             Beta users participate in a short focus group survey after using the
             app to help us build a better product for surgeons.
@@ -56,16 +56,16 @@ export default function ContactPage() {
 
         <div className="grid gap-12 md:grid-cols-2">
           {/* Beta signup form — shows second on mobile, first (left) on desktop */}
-          <div className="order-2 rounded-2xl border border-white/10 bg-navy-light/50 p-8 md:order-1">
-            <h2 className="mb-6 text-2xl font-bold text-white">Request Beta Access</h2>
+          <div className="order-2 rounded-2xl border border-foreground/10 bg-navy-light/50 p-8 md:order-1">
+            <h2 className="mb-6 text-2xl font-bold text-foreground">Request Beta Access</h2>
 
             {status === "success" ? (
               <div className="rounded-xl border border-teal/30 bg-teal/10 p-6 text-center">
                 <svg className="mx-auto mb-3 h-10 w-10 text-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
-                <h3 className="mb-2 text-lg font-semibold text-white">You&apos;re on the list!</h3>
-                <p className="text-gray-400">
+                <h3 className="mb-2 text-lg font-semibold text-foreground">You&apos;re on the list!</h3>
+                <p className="text-slate-500">
                   Thanks for joining the PicSurg beta. We&apos;ll send you a
                   TestFlight invite soon. After you&apos;ve had time to use the
                   app, we&apos;ll follow up with a short feedback survey.
@@ -74,7 +74,7 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="name" className="mb-2 block text-sm font-medium text-slate-600">
                     Full Name
                   </label>
                   <input
@@ -82,12 +82,12 @@ export default function ContactPage() {
                     id="name"
                     name="name"
                     required
-                    className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    className="w-full rounded-xl border border-foreground/10 bg-white px-4 py-3 text-foreground placeholder-slate-400 outline-none transition-colors focus:border-teal"
                     placeholder="Dr. Jane Smith"
                   />
                 </div>
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-600">
                     Email Address
                   </label>
                   <input
@@ -95,12 +95,12 @@ export default function ContactPage() {
                     id="email"
                     name="email"
                     required
-                    className="w-full rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    className="w-full rounded-xl border border-foreground/10 bg-white px-4 py-3 text-foreground placeholder-slate-400 outline-none transition-colors focus:border-teal"
                     placeholder="jane@hospital.org"
                   />
                 </div>
                 <div>
-                  <label htmlFor="role" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="role" className="mb-2 block text-sm font-medium text-slate-600">
                     Current Role
                   </label>
                   <select id="role" name="role" required className={selectClasses}>
@@ -113,7 +113,7 @@ export default function ContactPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="practice" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="practice" className="mb-2 block text-sm font-medium text-slate-600">
                     Practice Setting
                   </label>
                   <select id="practice" name="practice" required className={selectClasses}>
@@ -124,7 +124,7 @@ export default function ContactPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="specialty" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="specialty" className="mb-2 block text-sm font-medium text-slate-600">
                     Specialty / Subspecialty
                   </label>
                   <select id="specialty" name="specialty" className={selectClasses}>
@@ -145,20 +145,20 @@ export default function ContactPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-300">
+                  <label htmlFor="message" className="mb-2 block text-sm font-medium text-slate-600">
                     Message (optional)
                   </label>
                   <textarea
                     id="message"
                     name="message"
                     rows={3}
-                    className="w-full resize-none rounded-xl border border-white/10 bg-navy px-4 py-3 text-white placeholder-gray-500 outline-none transition-colors focus:border-teal"
+                    className="w-full resize-none rounded-xl border border-foreground/10 bg-white px-4 py-3 text-foreground placeholder-slate-400 outline-none transition-colors focus:border-teal"
                     placeholder="Tell us about your use case..."
                   />
                 </div>
 
                 {/* Focus group consent */}
-                <div className="rounded-xl border border-white/10 bg-navy/50 p-4">
+                <div className="rounded-xl border border-foreground/10 bg-navy/50 p-4">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -166,11 +166,11 @@ export default function ContactPage() {
                       required
                       className="mt-1 h-4 w-4 shrink-0 accent-teal"
                     />
-                    <span className="text-sm text-gray-300">
+                    <span className="text-sm text-slate-600">
                       I understand that beta access includes participation in a
                       short feedback survey after using PicSurg. This helps us
                       improve the app for surgeons like me.{" "}
-                      <span className="text-gray-500">Required</span>
+                      <span className="text-slate-400">Required</span>
                     </span>
                   </label>
                 </div>
@@ -193,31 +193,31 @@ export default function ContactPage() {
 
           {/* Sidebar info — shows first on mobile, second (right) on desktop */}
           <div className="order-1 space-y-8 md:order-2">
-            <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
-              <h2 className="mb-4 text-2xl font-bold text-white">How It Works</h2>
-              <ol className="space-y-4 text-gray-400">
+            <div className="rounded-2xl border border-foreground/10 bg-navy-light/50 p-8">
+              <h2 className="mb-4 text-2xl font-bold text-foreground">How It Works</h2>
+              <ol className="space-y-4 text-slate-500">
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">1</span>
-                  <span><span className="font-medium text-white">Sign up</span>: fill out this form to request access</span>
+                  <span><span className="font-medium text-foreground">Sign up</span>: fill out this form to request access</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">2</span>
-                  <span><span className="font-medium text-white">Get the app</span>: receive a TestFlight invite via email</span>
+                  <span><span className="font-medium text-foreground">Get the app</span>: receive a TestFlight invite via email</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">3</span>
-                  <span><span className="font-medium text-white">Use PicSurg</span>: try it in your workflow for a few weeks</span>
+                  <span><span className="font-medium text-foreground">Use PicSurg</span>: try it in your workflow for a few weeks</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-teal/20 text-xs font-bold text-teal">4</span>
-                  <span><span className="font-medium text-white">Give feedback</span>: complete a short survey about your experience</span>
+                  <span><span className="font-medium text-foreground">Give feedback</span>: complete a short survey about your experience</span>
                 </li>
               </ol>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
-              <h2 className="mb-4 text-xl font-bold text-white">What You Get</h2>
-              <ul className="space-y-3 text-gray-400">
+            <div className="rounded-2xl border border-foreground/10 bg-navy-light/50 p-8">
+              <h2 className="mb-4 text-xl font-bold text-foreground">What You Get</h2>
+              <ul className="space-y-3 text-slate-500">
                 <li className="flex items-start gap-3">
                   <span className="mt-0.5 inline-block h-2 w-2 shrink-0 rounded-full bg-teal" />
                   Free access to PicSurg during beta
@@ -237,9 +237,9 @@ export default function ContactPage() {
               </ul>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-navy-light/50 p-8">
-              <h2 className="mb-4 text-xl font-bold text-white">Get in Touch</h2>
-              <p className="mb-4 text-gray-400">
+            <div className="rounded-2xl border border-foreground/10 bg-navy-light/50 p-8">
+              <h2 className="mb-4 text-xl font-bold text-foreground">Get in Touch</h2>
+              <p className="mb-4 text-slate-500">
                 Have questions? Reach out directly.
               </p>
               <div className="flex items-center gap-3">
@@ -248,7 +248,7 @@ export default function ContactPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                   </svg>
                 </div>
-                <a href="mailto:contact@picsurg.com" className="text-gray-300 hover:text-teal-light">
+                <a href="mailto:contact@picsurg.com" className="text-slate-600 hover:text-teal">
                   contact@picsurg.com
                 </a>
               </div>

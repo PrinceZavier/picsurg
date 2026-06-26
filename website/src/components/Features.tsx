@@ -42,10 +42,10 @@ export default function Features() {
     <section className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
             Built for healthcare professionals
           </h2>
-          <p className="mx-auto max-w-2xl text-gray-400">
+          <p className="mx-auto max-w-2xl text-slate-500">
             PicSurg combines machine learning with military-grade encryption to keep your
             surgical documentation secure and separate from personal photos.
           </p>
@@ -55,13 +55,13 @@ export default function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-white/10 bg-navy-light/50 p-8 transition-colors hover:border-teal/30"
+              className="rounded-2xl border border-foreground/10 bg-navy-light/50 p-8 transition-colors hover:border-teal/30"
             >
               <div className="mb-4 inline-flex rounded-xl bg-teal/10 p-3 text-teal">
                 {feature.icon}
               </div>
-              <h3 className="mb-2 text-xl font-semibold text-white">{feature.title}</h3>
-              <p className="text-gray-400">{feature.description}</p>
+              <h3 className="mb-2 text-xl font-semibold text-foreground">{feature.title}</h3>
+              <p className="text-slate-500">{feature.description}</p>
             </div>
           ))}
         </div>
