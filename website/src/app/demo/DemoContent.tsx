@@ -52,14 +52,14 @@ export default function DemoContent() {
 
           {/* Watermark overlay */}
           <div
-            className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
             aria-hidden
           >
             <p
-              className="whitespace-nowrap text-xs font-bold tracking-widest text-foreground"
-              style={{ transform: "rotate(-30deg)", opacity: 0.25 }}
+              className="whitespace-nowrap text-[10px] font-semibold tracking-[0.2em] text-foreground"
+              style={{ opacity: 0.18 }}
             >
-              CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG · CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG
+              CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG
             </p>
           </div>
         </div>
