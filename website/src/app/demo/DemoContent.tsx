@@ -56,8 +56,8 @@ export default function DemoContent() {
             aria-hidden
           >
             <p
-              className="whitespace-nowrap text-xs font-bold tracking-widest text-white"
-              style={{ transform: "rotate(-30deg)", opacity: 0.15 }}
+              className="whitespace-nowrap text-xs font-bold tracking-widest text-foreground"
+              style={{ transform: "rotate(-30deg)", opacity: 0.25 }}
             >
               CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG · CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG
             </p>
