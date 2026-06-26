@@ -36,7 +36,8 @@ export default function DemoContent() {
         </div>
 
         {/* Video with watermark overlay */}
-        <div className="relative overflow-hidden rounded-2xl border border-foreground/10 bg-black">
+        <div className="flex justify-center">
+        <div className="relative w-full max-w-xs overflow-hidden rounded-2xl border border-foreground/10 bg-black">
           <video
             ref={videoRef}
             controls
@@ -61,6 +62,7 @@ export default function DemoContent() {
               CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG · CONFIDENTIAL · GRANT REVIEW ONLY · PICSURG
             </p>
           </div>
+        </div>
         </div>
 
         {/* Footer */}
