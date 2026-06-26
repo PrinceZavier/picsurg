@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 const DEMO_PASSWORD = "PICSURGGRANT2026!";
 const COOKIE_VALUE = "picsurg_demo_v1";
-const THIRTY_DAYS = 60 * 60 * 24 * 30;
+const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export async function POST(request: Request) {
   const { password } = await request.json();
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: THIRTY_DAYS,
+    maxAge: ONE_YEAR,
     path: "/",
   });
 
