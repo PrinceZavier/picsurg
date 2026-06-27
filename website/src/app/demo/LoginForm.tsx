@@ -41,7 +41,7 @@ export default function LoginForm() {
         <div className="mb-8 flex justify-center">
           <Image src="/logo.png" alt="PicSurg" width={64} height={64} className="rounded-2xl" />
         </div>
-        <h1 className="mb-2 text-center text-2xl font-bold text-foreground">PicSurg Demo</h1>
+        <h1 className="mb-2 text-center text-2xl font-bold text-foreground">PicSurg™ Demo</h1>
         <p className="mb-8 text-center text-sm text-slate-500">
           This page is restricted to authorized reviewers only.
         </p>

@@ -23,7 +23,7 @@ export default function DemoContent() {
         {/* Header */}
         <div className="mb-10 flex items-center gap-3">
           <Image src="/logo.png" alt="PicSurg" width={40} height={40} className="rounded-xl" />
-          <span className="text-lg font-bold text-foreground">PicSurg</span>
+          <span className="text-lg font-bold text-foreground">PicSurg™</span>
         </div>
 
         {/* Confidential notice */}
@@ -72,7 +72,7 @@ export default function DemoContent() {
           <a href="https://picsurg.com" className="text-teal hover:underline">picsurg.com</a>
         </p>
         <p className="mt-3 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} PicSurg. All rights reserved. This technology and its implementation
+          © {new Date().getFullYear()} PicSurg™. All rights reserved. This technology and its implementation
           are proprietary and confidential. Unauthorized reproduction or distribution is prohibited.
         </p>
       </div>

@@ -54,7 +54,7 @@ export default function Hero() {
         </h1>
 
         <p className="mx-auto mb-10 max-w-2xl text-lg text-slate-500 md:text-xl">
-          PicSurg uses machine learning to detect operative photos in your camera roll
+          PicSurg™ uses machine learning to detect operative photos in your camera roll
           and locks them in a secure encrypted vault, so your personal and
           professional photos stay separate.
         </p>

@@ -76,7 +76,7 @@ export default function SecurityPage() {
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">
-            Security & Legal
+            PicSurg™ Security & Legal
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-slate-500">
             PicSurg was designed from the ground up with security as a core principle.

@@ -12,7 +12,7 @@ export default function Header() {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
           <Image src="/icon.png" alt="PicSurg" width={36} height={36} className="rounded-lg" />
-          <span className="text-xl font-bold text-foreground">PicSurg</span>
+          <span className="text-xl font-bold text-foreground">PicSurg™</span>
         </Link>
 
         {/* Desktop nav */}

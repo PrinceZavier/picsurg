@@ -45,7 +45,7 @@ export default function ContactPage() {
         {/* Header */}
         <div className="mb-16 text-center">
           <h1 className="mb-4 text-4xl font-bold text-foreground md:text-5xl">
-            Join the PicSurg Beta
+            Join the PicSurg™ Beta
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-slate-500">
             Get free early access to PicSurg in exchange for your feedback.

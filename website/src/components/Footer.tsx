@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="grid gap-8 md:grid-cols-3">
           <div>
-            <h3 className="mb-3 text-lg font-bold text-foreground">PicSurg</h3>
+            <h3 className="mb-3 text-lg font-bold text-foreground">PicSurg™</h3>
             <p className="text-sm text-slate-500">
               ML-powered surgical photo detection with privacy-aware encrypted storage.
             </p>
@@ -28,7 +28,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t border-foreground/10 pt-6 text-center text-sm text-slate-400">
-          &copy; {new Date().getFullYear()} PicSurg. All rights reserved.
+          &copy; {new Date().getFullYear()} PicSurg™. All rights reserved.
         </div>
       </div>
     </footer>
