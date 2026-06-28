@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const DEMO_PASSWORD = "PICSURGGRANT2026!";
+const DEMO_PASSWORD = "PICSURGGRANT2026";
 const COOKIE_VALUE = "picsurg_demo_v1";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
