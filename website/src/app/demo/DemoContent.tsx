@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import { track } from "@vercel/analytics";
 
 export default function DemoContent() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,6 +46,7 @@ export default function DemoContent() {
             className="w-full"
             preload="metadata"
             onContextMenu={(e) => e.preventDefault()}
+            onPlay={() => track("demo_video_play")}
           >
             <source src="/picsurg_demo_final.mp4" type="video/mp4" />
             Your browser does not support the video tag.
